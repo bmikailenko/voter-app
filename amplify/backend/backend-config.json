@@ -1,0 +1,10 @@
+{
+	"auth": {
+		"voterapp4b1ae358": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [],
+			"customAuth": false
+		}
+	}
+}

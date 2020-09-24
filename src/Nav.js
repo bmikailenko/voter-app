@@ -16,11 +16,8 @@ function Nav() {
         <Link style={navStyle} to="/about">
           <li>About</li>
         </Link>
-        <Link style={navStyle} to="/login">
-          <li>Login</li>
-        </Link>
-        <Link style={navStyle} to="/signup">
-          <li>Signup</li>
+        <Link style={navStyle} to="/dashboard">
+          <li>Dashboard</li>
         </Link>
       </ul>
     </nav>
