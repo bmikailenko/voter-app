@@ -25,7 +25,7 @@ function App() {
 
 const Home = () => (
   <div>
-    <h1>Home Page</h1>
+    <h1>Landing Page</h1>
   </div>
 );
 
