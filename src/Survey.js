@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import './App.css';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
-import * as Survey_questions from "survey-react";
+import * as SurveyQuestions from "survey-react";
 import "survey-react/survey.css";
 
 
@@ -17,7 +17,7 @@ function Survey() {
     <div>
       <AmplifySignOut />
       <h1>Survey Page</h1>
-      <Survey_questions.Survey json={surveyJSON} onComplete={onComplete}/>
+      <SurveyQuestions.Survey json={surveyJSON} onComplete={onComplete}/>
       <Link to="/dashboard">Dashboard</Link>
     </div>
   );
