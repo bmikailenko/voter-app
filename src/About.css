@@ -7,6 +7,38 @@ html {
   box-sizing: border-box;
 }
 
+.purpose-section {
+    color: rgb(21, 43, 93);
+    font-size: 28px;
+    padding: 30px;
+    margin-left: 10%;
+    margin-top: 50px;
+    text-align: left;
+}
+
+.purpose-row {
+	width: 100%;
+	max-width: 1260px;
+	max-width: var(--page-max-width);
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(4,1fr);
+	grid-template-columns: repeat(var(--num-grid-columns),1fr);
+	gap: 0 20px;
+	padding: 0 24px;
+	padding: 0 var(--page-gutter);
+}
+
+.purpose-column {
+	grid-column: span 4;
+}
+
+.purpose-column::after, .row::after {
+  clear: both;
+  display: table;
+}
+
 *, *:before, *:after {
   box-sizing: inherit;
 }
@@ -21,13 +53,6 @@ html {
 .card {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   margin: 10px;
-}
-
-.about-section {
-  padding: 30px;
-  text-align: center;
-  background-color:  #283468;
-  color: white;
 }
 
 .container {
