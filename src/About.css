@@ -3,8 +3,19 @@ body {
   margin: 0;
 }
 
-.grid1 {
-    margin-bottom: 25%;
+.grid3 {
+    color: white;
+    height: 800px;
+    margin-bottom: 10%;
+    background: rgb(21, 43, 93);
+}
+
+.dividerTop {
+    transform: rotate(180deg) translateY(5px);
+}
+
+.dividerBottom {
+    
 }
 
 .purpose-section {
@@ -12,18 +23,40 @@ body {
     font-size: 28px;
     padding: 30px;
     margin-left: 8%;
-    margin-top: 50px;
     text-align: left;
 }
 
-.purpose-row {
+.voter-row {
     font: Whitney;
     display: inline-grid;
     grid-template-columns: 450px 450px 450px;
-
 }
 
-.purpose-column {
+.voter-column {
+    text-align: left;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.candidate-container {
+    padding-top: 120px;
+    padding-bottom: 150px;
+}
+
+.candidate-title {
+    font-size: 24px;
+    text-align: left;
+    padding-left: 180px;
+}
+
+.candidate-row {
+    text-align: center;
+    font: Whitney;
+    display: inline-grid;
+    grid-template-columns: 450px 450px 450px;
+}
+
+.candidate-column {
     text-align: left;
     padding-left: 30px;
     padding-right: 30px;
