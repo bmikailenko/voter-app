@@ -1,0 +1,107 @@
+body {
+
+  margin: 0;
+}
+
+.grid3 {
+    color: white;
+    height: 800px;
+    margin-bottom: 10%;
+    background: rgb(21, 43, 93);
+}
+
+.dividerTop {
+    transform: rotate(180deg) translateY(5px);
+}
+
+.dividerBottom {
+    
+}
+
+.purpose-section {
+    color: rgb(21, 43, 93);
+    font-size: 28px;
+    padding: 30px;
+    margin-left: 8%;
+    text-align: left;
+}
+
+.voter-row {
+    font: Whitney;
+    display: inline-grid;
+    grid-template-columns: 450px 450px 450px;
+}
+
+.voter-column {
+    text-align: left;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.candidate-container {
+    padding-top: 120px;
+    padding-bottom: 150px;
+}
+
+.candidate-title {
+    font-size: 24px;
+    text-align: left;
+    padding-left: 180px;
+}
+
+.candidate-row {
+    text-align: center;
+    font: Whitney;
+    display: inline-grid;
+    grid-template-columns: 450px 450px 450px;
+}
+
+.candidate-column {
+    text-align: left;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.column {
+  float: left;
+  width: 16.66%;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin: 10px;
+}
+
+.container {
+  padding: 8px;
+}
+
+
+.title {
+  color: grey;
+}
+
+.button {
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: #1b1b1c;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.button:hover {
+  background-color: #555;
+}
+
+@media screen and (max-width: 650px) {
+  .column {
+    width: 100%;
+    display: block;
+  }
+}
