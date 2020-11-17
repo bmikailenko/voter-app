@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Auth, API, graphqlOperation } from 'aws-amplify';
 import {Link} from 'react-router-dom';
-import './App.css';
-import './Survey.css';
+import { createSurvey, updateSurvey } from './graphql/mutations';
+import { getSurvey } from './graphql/queries';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import * as SurveyQuestions from "survey-react";
+import './App.css';
 import "survey-react/survey.css";
 
 
 function Survey() {
+  var [userSurvey, setUserSurvey] = useState(); 
+
   var surveyJSON = {
     pages: [
         {   name: "page1",
@@ -57,8 +61,43 @@ function Survey() {
      ] 
    }
 
+  useEffect(() => {
+    const getUserSurvey = async () => { 
+      const user = await Auth.currentUserInfo();
+      const sub = await user.attributes.sub;
+      const surveyData = await API.graphql(graphqlOperation(getSurvey, {id: sub}));
+      if (surveyData.data.getSurvey !== null) {
+        const userSurvey = await await surveyData.data.getSurvey.data;
+        if (userSurvey) {
+          setUserSurvey(userSurvey)
+        } else {
+          setUserSurvey('You dont have one yet!');
+        }
+      }    
+    }
+    getUserSurvey();
+  },[userSurvey]);
+
+  const updateUserSurvey = async (newSurvey) => {
+    try {
+      const user = await Auth.currentUserInfo();
+      const sub = await user.attributes.sub;
+      const graphqlEntry = { 'id': sub, 'data': newSurvey };
+      if (!userSurvey) {
+        await API.graphql(graphqlOperation(createSurvey, {input: graphqlEntry}));
+      } else {
+        await API.graphql(graphqlOperation(updateSurvey, {input: graphqlEntry}));
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   function onComplete(survey) {
     console.log("The results are:" + JSON.stringify(survey.data));
+    const newSurvey = survey.data;
+    updateUserSurvey(newSurvey);
+    setUserSurvey(newSurvey);
   }
 
   return (
