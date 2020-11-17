@@ -19,12 +19,14 @@ function Survey() {
       const user = await Auth.currentUserInfo();
       const sub = await user.attributes.sub;
       const surveyData = await API.graphql(graphqlOperation(getSurvey, {id: sub}));
-      const userSurvey = await await surveyData.data.getSurvey.data;
-      if (userSurvey) {
-        setUserSurvey(userSurvey)
-      } else {
-        setUserSurvey('You dont have one yet!');
-      }
+      if (surveyData.data.getSurvey !== null) {
+        const userSurvey = await await surveyData.data.getSurvey.data;
+        if (userSurvey) {
+          setUserSurvey(userSurvey)
+        } else {
+          setUserSurvey('You dont have one yet!');
+        }
+      }    
     }
     getUserSurvey();
   },[userSurvey]);
