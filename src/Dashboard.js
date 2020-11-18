@@ -3,12 +3,12 @@ import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { getSurvey } from './graphql/queries';
 import { Link } from 'react-router-dom';
+import "survey-react/survey.css";
 import './App.css';
 
 
 function Dashboard() {
   var [userSurvey, setUserSurvey] = useState();  
-
   useEffect(() => {
     const getUserSurvey = async () => {
       const user = await Auth.currentUserInfo();
@@ -16,7 +16,6 @@ function Dashboard() {
       const userSurvey = await fetchSurvey(sub);
       if (userSurvey) {
         setUserSurvey(userSurvey.data);
-        console.log(userSurvey.data);
       } else {
         console.log("no user survey yet!");
       }
@@ -43,6 +42,10 @@ function Dashboard() {
         </div>
         <div>
           <Link to="/candidate-verification">Are you a candidate?</Link>
+        </div>
+        <div>
+        <h2>Survey results:</h2>
+        <p>{userSurvey}</p>
         </div>
       </div>
   );

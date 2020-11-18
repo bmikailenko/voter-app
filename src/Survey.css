@@ -1,0 +1,13 @@
+.title-section {
+    color: rgb(21, 43, 93);
+    font-size: 28px;
+    padding: 30px;
+    margin-left: 8%;
+    text-align: left;
+}
+
+.questions {
+    text-align: left;
+    padding-left: 10%;
+    padding-right: 10%;
+}
