@@ -6,6 +6,7 @@ import { getSurvey } from './graphql/queries';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import * as SurveyQuestions from "survey-react";
 import './App.css';
+import './Survey.css';
 import "survey-react/survey.css";
 
 
