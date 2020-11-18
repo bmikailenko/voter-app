@@ -94,8 +94,8 @@ function Survey() {
   }
 
   function onComplete(survey) {
-    console.log("The results are:" + JSON.stringify(survey.data));
-    const newSurvey = survey.data;
+    const newSurvey = JSON.stringify(survey.getPlainData());
+    console.log("The results are:" + newSurvey);
     updateUserSurvey(newSurvey);
     setUserSurvey(newSurvey);
   }
