@@ -28,26 +28,7 @@ function Dashboard() {
     getUserSurvey();
   },[userSurvey]);
 
-  let nextToken;
-
-  async function listUsers(limit){
-    let apiName = 'AdminQueries';
-    let path = '/listUsers';
-    let myInit = { 
-        queryStringParameters: {
-          "limit": limit,
-          "token": nextToken
-        },
-        headers: {
-          'Content-Type' : 'application/json',
-          Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
-        }
-    }
-    const { NextToken, ...rest } =  await API.get(apiName, path, myInit);
-    nextToken = NextToken;
-    console.log(rest);
-    return rest;
-  }
+  
 
   const fetchSurvey = async (sub) => {
     try {
@@ -77,8 +58,21 @@ function Dashboard() {
   ) :
   (
     <div>
-      Hah you rock
-      <button onClick={() => listUsers(10)}>List users</button>
+      <AmplifySignOut />
+      <h1>My Dashboard</h1>
+      <div>
+      <Link to="/survey">Survey</Link>
+      </div>
+      <div>
+        <Link to="/candidate-verification">Are you a candidate?</Link>
+      </div>
+      <div>
+        <Link to="/admin">Go to admin page</Link>
+      </div>
+      <div>
+      <h2>Survey results:</h2>
+      <p>{userSurvey}</p>
+      </div>
     </div>
   );
 }
