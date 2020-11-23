@@ -1,10 +1,14 @@
 [
     {
-        "groupName": "candidate",
+        "groupName": "admin",
         "precedence": 1
     },
     {
-        "groupName": "voter",
+        "groupName": "candidate",
         "precedence": 2
+    },
+    {
+        "groupName": "voter",
+        "precedence": 3
     }
 ]
