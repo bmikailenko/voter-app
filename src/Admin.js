@@ -16,7 +16,8 @@ function Admin() {
       const group = await user.signInUserSession.idToken.payload['cognito:groups'];
       if (group.includes('admin')) {
         setUserGroup('admin');
-        getAllUsersAndData(10);   
+        getAllUsersAndData(10);  
+        console.log("ping"); 
       }
     }
 
@@ -38,19 +39,23 @@ function Admin() {
       nextToken = NextToken;
       var userData = [];
       for (const user of rest.Users) {
+        var groups = await listGroups(user.Username);
+        groups = groups.map(function(elem){
+          return elem.GroupName;
+        }).join(', ');
         var userSurvey = await fetchSurvey(user.Username);
         if (!userSurvey) {
           userSurvey = {'data':'No Survey!'}
-          userData.push({'username':user.Username, 'survey':userSurvey});
+          userData.push({'username':user.Username, 'survey':userSurvey, 'groups': groups});
         } else {
-          userData.push({'username':user.Username, 'survey':userSurvey});
+          userData.push({'username':user.Username, 'survey':userSurvey, 'groups': groups});
         }
       }
       setUserSurveys(userData);
     }
 
     getUserSurvey();
-  });
+  },[userGroup]);
 
   const fetchSurvey = async (sub) => {
     try {
@@ -63,22 +68,51 @@ function Admin() {
   }
 
   async function addCandidate (sub) {
-    let nextToken;
     const apiName = 'AdminQueries';
     const path = '/addUserToGroup';
     const myInit = { 
-      queryStringParameters: {
+      body: {
         "username": sub,
         "groupname": 'candidate',
-        "token": nextToken
       },
       headers: {
         'Content-Type' : 'application/json',
         Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
       }
     }
-    const { NextToken, ...rest } =  await API.get(apiName, path, myInit);
-    nextToken = NextToken;
+    API.post(apiName, path, myInit);
+  }
+
+  async function removeCandidate (sub) {
+    const apiName = 'AdminQueries';
+    const path = '/removeUserFromGroup';
+    const myInit = { 
+      body: {
+        "username": sub,
+        "groupname": 'candidate',
+      },
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
+      }
+    }
+    await API.post(apiName, path, myInit);
+  }
+
+  async function listGroups (sub) {
+    const apiName = 'AdminQueries';
+    const path = '/listGroupsForUser';
+    const myInit = { 
+      queryStringParameters: {
+        "username": sub,
+      },
+      headers: {
+        'Content-Type' : 'application/json',
+        Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
+      }
+    }
+    const value =  await API.get(apiName, path, myInit);
+    return value.Groups;
   }
 
   return (userGroup !== 'admin') ? (
@@ -113,10 +147,13 @@ function Admin() {
                   {user.username}
                 </td>
                 <td>
-                  Groups: {userGroup}
+                  Groups: {user.groups}
                 </td>
                 <td>
-                  <button>Add to Candidates</button>
+                  <button onClick={() => addCandidate(user.username)}>Add to Candidates</button>
+                </td>
+                <td>
+                  <button onClick={() => removeCandidate(user.username)}>Remove from Candidates</button>
                 </td>
                 <td>
                   {user.survey.data}

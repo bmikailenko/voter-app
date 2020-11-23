@@ -24,6 +24,7 @@ function Dashboard() {
       if (group.includes('admin')) {
         setUserGroup('admin');
       }
+      console.log("dashboard.ping!");
     }
     getUserSurvey();
   },[userSurvey]);
