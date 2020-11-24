@@ -18,6 +18,18 @@ function Survey() {
     "pages": [
      {
       "name": "page1",
+      "elements": [
+       {
+        "type": "text",
+        "name": "Zipcode",
+        "title": "Zipcode",
+        "description": "Please enter your 5 digit zipcode to continue",
+        "isRequired": true,
+        "requiredErrorText": "Please enter your Zipcode to continue",
+        "inputType": "number",
+        "size": 26
+       }
+      ],
       "title": "Which candidate would best represent my beliefs?",
       "description": "Take this survey and answer as honestly as possible so that we can match you with the best possible political candidate."
      },

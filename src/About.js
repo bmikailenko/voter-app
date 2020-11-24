@@ -105,7 +105,7 @@ function About() {
 
                     <div class="container">
                         <h2>Daniel Yarmolenko</h2>
-                        <p class="title">Designer</p>
+                        <p class="title">Back-end Developer</p>
                         <p>Some text that describes me lorem ipsum ipsum lorem.</p>
                         <p>@example.com</p>
                         <p><button class="button">Contact</button></p>
@@ -119,7 +119,7 @@ function About() {
 
                     <div class="container">
                         <h2>David Barko</h2>
-                        <p class="title">Designer</p>
+                        <p class="title">Back-end Developer</p>
                         <p>Some text that describes me lorem ipsum ipsum lorem.</p>
                         <p>@example.com</p>
                         <p><button class="button">Contact</button></p>
