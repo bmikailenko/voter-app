@@ -12,6 +12,7 @@ import './Survey.css';
 
 function Survey() {
   var [userSurvey, setUserSurvey] = useState(); 
+  var [isCandidate, setIsCandidate] = useState(false);
 
   var surveyJSON = {
     "pages": [
@@ -1980,6 +1981,8 @@ function Survey() {
   useEffect(() => {
     const getUserSurvey = async () => { 
       const user = await Auth.currentUserInfo();
+      const authUser = await Auth.currentAuthenticatedUser();
+      const group = await authUser.signInUserSession.idToken.payload['cognito:groups'];
       const sub = await user.attributes.sub;
       const surveyData = await API.graphql(graphqlOperation(getSurvey, {id: sub}));
       if (surveyData.data.getSurvey !== null) {
@@ -1989,10 +1992,13 @@ function Survey() {
         } else {
           setUserSurvey('You dont have one yet!');
         }
+      }
+      if (group.includes('candidate')) {
+        setIsCandidate(true);
       }    
     }
     getUserSurvey();
-  },[userSurvey]);
+  },[userSurvey, isCandidate]);
 
   const updateUserSurvey = async (newSurvey) => {
     try {
@@ -2012,6 +2018,11 @@ function Survey() {
   function onComplete(survey) {
     console.log("The results are:" + JSON.stringify(survey.data));
     const newSurvey = survey.data;
+    if (isCandidate) {
+      newSurvey.userGroup = 'candidate';
+    } else {
+      newSurvey.userGroup = 'voter';
+    }
     updateUserSurvey(newSurvey);
     setUserSurvey(newSurvey);
   }
