@@ -17,7 +17,6 @@ function Admin() {
       if (group.includes('admin')) {
         setUserGroup('admin');
         getAllUsersAndData(10);  
-        console.log("ping"); 
       }
     }
 
