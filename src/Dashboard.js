@@ -7,7 +7,7 @@ import "survey-react/survey.css";
 import './App.css';
 
 function Dashboard() {
-  var [userSurvey, setUserSurvey] = useState();  
+  var [userSurvey, setUserSurvey] = useState();
   var [userGroup, setUserGroup] = useState(null);
   var [isCandidate, setIsCandidate] = useState(false);
 
@@ -30,68 +30,27 @@ function Dashboard() {
       }
     }
     getUserSurvey();
-  },[userSurvey, isCandidate]);
-  function modifySurveyResults(survey){
-    var resultData = [];
-    for(var key in survey.data){
-      var question = survey.getQuestionByValueName(key);
-      if(!!question) {
-        var item = {value: question.value};
-        if(key !== question.title){
-          item.title = question.title;
-        }
-        if(item.value != question.displayValue){
-          item.displayValue = question.displayValue
-        }
-        console.log(item.displayValue);
-      }
-      resultData.push(item.title);
-      resultData.push(item.displayValue);
-    }
-    return resultData;
-  }
+  }, [userSurvey, isCandidate]);
+
   const fetchSurvey = async (sub) => {
     try {
-      const surveyData = await API.graphql(graphqlOperation(getSurvey, {id: sub}));
+      const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
       const survey = await surveyData.data.getSurvey;
       return survey;
     } catch (e) {
       console.log(e);
     }
   }
+  function parseSurvey(survey) {
+    var surveyArray = '' + survey;
+    surveyArray = surveyArray.replace('[', '');
+    surveyArray = surveyArray.replace('"]', '');
+    //  surveyArray = surveyArray.replace(/"/g, '');
+    const theArray = surveyArray.split('","');
+    return theArray;
+  }
 
   return (userGroup !== 'admin') ? (
-      <div>
-
-        <AmplifySignOut />
-
-        <h1>My Dashboard</h1>
-
-        {(isCandidate) ?
-        (<div>
-          You are a candidate
-        </div>)
-        :
-        (<div>
-          You are a voter
-        </div>)}
-
-        <div>
-          <Link to="/survey">Survey</Link>
-        </div>
-
-        <div>
-          <Link to="/candidate-verification">Are you a candidate?</Link>
-        </div>
-        
-        <div>
-          <h2>Survey results:</h2>
-          <p>{userSurvey}</p>
-        </div>
-
-      </div>
-  ) :
-  (
     <div>
 
       <AmplifySignOut />
@@ -108,7 +67,7 @@ function Dashboard() {
         </div>)}
 
       <div>
-      <Link to="/survey">Survey</Link>
+        <Link to="/survey">Survey</Link>
       </div>
 
       <div>
@@ -116,16 +75,49 @@ function Dashboard() {
       </div>
 
       <div>
-        <Link to="/admin">Go to admin page</Link>
-      </div>
-
-      <div>
         <h2>Survey results:</h2>
-        <p>{userSurvey}</p>
+        <div>
+          {parseSurvey(userSurvey).map(txt => <p>{txt}</p>)}
+        </div>
       </div>
 
     </div>
-  );
+  ) :
+    (
+      <div>
+
+        <AmplifySignOut />
+
+        <h1>My Dashboard</h1>
+
+        {(isCandidate) ?
+          (<div>
+            You are a candidate
+          </div>)
+          :
+          (<div>
+            You are a voter
+          </div>)}
+
+        <div>
+          <Link to="/survey">Survey</Link>
+        </div>
+
+        <div>
+          <Link to="/candidate-verification">Are you a candidate?</Link>
+        </div>
+
+        <div>
+          <Link to="/admin">Go to admin page</Link>
+        </div>
+
+        <div>
+          <h2>Survey results:</h2>
+          <p>{userSurvey}</p>
+        </div>
+
+      </div>
+    );
 }
 
 export default withAuthenticator(Dashboard);
