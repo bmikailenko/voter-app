@@ -31,7 +31,25 @@ function Dashboard() {
     }
     getUserSurvey();
   },[userSurvey, isCandidate]);
-
+  function modifySurveyResults(survey){
+    var resultData = [];
+    for(var key in survey.data){
+      var question = survey.getQuestionByValueName(key);
+      if(!!question) {
+        var item = {value: question.value};
+        if(key !== question.title){
+          item.title = question.title;
+        }
+        if(item.value != question.displayValue){
+          item.displayValue = question.displayValue
+        }
+        console.log(item.displayValue);
+      }
+      resultData.push(item.title);
+      resultData.push(item.displayValue);
+    }
+    return resultData;
+  }
   const fetchSurvey = async (sub) => {
     try {
       const surveyData = await API.graphql(graphqlOperation(getSurvey, {id: sub}));
