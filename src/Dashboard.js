@@ -43,9 +43,11 @@ function Dashboard() {
   }
   function parseSurvey(survey) {
     var surveyArray = '' + survey;
-    surveyArray = surveyArray.replace('[', '');
+    var arrey = surveyArray.split('"1.)', 1);
+    var newArray = arrey[0];
+    //Remove the zipcode from display
+    surveyArray = surveyArray.replace(newArray + '"', '');
     surveyArray = surveyArray.replace('"]', '');
-    //  surveyArray = surveyArray.replace(/"/g, '');
     const theArray = surveyArray.split('","');
     return theArray;
   }
