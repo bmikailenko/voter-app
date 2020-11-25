@@ -2047,15 +2047,17 @@ function Survey() {
   }
   function onComplete(survey) {
     console.log("The results are:" + JSON.stringify(survey.data));
-    const newSurvey =  JSON.stringify(modifySurveyResults(survey));
+    const newSurvey = survey.data;
     if (isCandidate) {
       newSurvey.userGroup = 'candidate';
     } else {
       newSurvey.userGroup = 'voter';
     }
-    updateUserSurvey(newSurvey);
-    setUserSurvey(newSurvey);
+    const modSurvey = JSON.stringify(modifySurveyResults(survey));;
+    updateUserSurvey(modSurvey);
+    setUserSurvey(modSurvey);
   }
+
   return (
     <div>
       <AmplifySignOut />

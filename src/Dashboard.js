@@ -113,7 +113,9 @@ function Dashboard() {
 
         <div>
           <h2>Survey results:</h2>
-          <p>{userSurvey}</p>
+          <div>
+            {parseSurvey(userSurvey).map(txt => <p>{txt}</p>)}
+          </div>
         </div>
 
       </div>
