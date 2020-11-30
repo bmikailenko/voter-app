@@ -22,13 +22,17 @@ function Dashboard() {
       } else {
         console.log("no user survey yet!");
       }
-      if (group.includes('admin')) {
+      if(group !== undefined){
+        if (group.includes('candidate')) {
+          setIsCandidate(true);
+        }
+        if (group.includes('admin')) {
         setUserGroup('admin');
-      }
-      if (group.includes('candidate')) {
-        setIsCandidate(true);
-      }
+       }
     }
+    console.log(group);
+    }
+
     getUserSurvey();
   }, [userSurvey, isCandidate]);
 

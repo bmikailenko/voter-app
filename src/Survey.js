@@ -2029,6 +2029,11 @@ function Survey() {
   function modifySurveyResults(survey) {
     //modify what data to save into db
     var resultData = [];
+    if (isCandidate) {
+     resultData.push('candidate');
+    } else {
+      resultData.push('voter');
+    }
     for (var key in survey.data) {
       var question = survey.getQuestionByValueName(key);
       if (!!question) {
@@ -2044,13 +2049,12 @@ function Survey() {
   }
   function onComplete(survey) {
     console.log("The results are:" + JSON.stringify(survey.data));
-    const newSurvey = survey.data;
-    if (isCandidate) {
-      newSurvey.userGroup = 'candidate';
-    } else {
-      newSurvey.userGroup = 'voter';
-    }
+   // const newSurvey = survey.data;
+   console.log(isCandidate);
+  
+    console.log("The changes:" +  JSON.stringify(survey));
     const modSurvey = JSON.stringify(modifySurveyResults(survey));;
+    console.log(modSurvey);
     updateUserSurvey(modSurvey);
     setUserSurvey(modSurvey);
   }
