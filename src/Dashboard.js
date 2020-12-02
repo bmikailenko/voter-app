@@ -12,7 +12,7 @@ function Dashboard() {
   var [userGroup, setUserGroup] = useState(null);
   var [isCandidate, setIsCandidate] = useState(false);
   var [candidateSurveyArray, setCandidateSurvey] = useState();
-  var ms;
+  var [bestCandidates, setBestCandidates] = useState();
   // getting all the candidates of the database ready for comparison
   async function listGroups(sub) {
     const apiName = 'AdminQueries';
@@ -35,7 +35,7 @@ function Dashboard() {
       const group = await user.signInUserSession.idToken.payload['cognito:groups'];
       const sub = await user.attributes.sub;
       const userSurvey = await fetchSurvey(sub);
-      ms = userSurvey;
+     
       if (userSurvey) {
         setUserSurvey(userSurvey.data);
       } else {
@@ -69,7 +69,9 @@ function Dashboard() {
       }
       const { NextToken, ...rest } = await API.get(apiName, path, myInit);
       nextToken = NextToken;
-      var candidateSurveyArray = [];
+      //var candidateSurveyArray = [];
+      //var bestCandidates = [];
+
       var tempCandidateSurveyArray = [];
       for (const user of rest.Users) {
         var groups = await listGroups(user.Username);
@@ -78,32 +80,67 @@ function Dashboard() {
         }).join(', ');
         var candidateSurvey = await fetchSurvey(user.Username);
         //fetch only candidates into the candidate array
+        var emailAsUserName;
+        for(const j of user.Attributes){
+          if(j.Name === "email"){
+            emailAsUserName = j.Value
+            //console.log(j.Value);
+          }
+        }
         if (groups === 'candidate' || groups === 'candidate, admin' || groups === 'admin, candidate') {
           if (!candidateSurvey) {
             candidateSurvey = {'data': 'No Survey!' }
-            tempCandidateSurveyArray.push({ 'username': user.Username, 'survey': candidateSurvey, 'groups': groups, 'matchValue': 0});
+            tempCandidateSurveyArray.push({ 'username': emailAsUserName, 'survey': candidateSurvey, 'groups': groups, 'matchValue': 0});
           } else {
-            tempCandidateSurveyArray.push({ 'username': user.Username, 'survey': candidateSurvey.data, 'groups': groups, 'matchValue': 0});
+            tempCandidateSurveyArray.push({ 'username': emailAsUserName, 'survey': candidateSurvey.data, 'groups': groups, 'matchValue': 0});
           }
         }
       }
-      findCandidateMatch(tempCandidateSurveyArray);
+      //Finding the best match candidate
+      var userSurveylen = parseSurvey(userSurvey).length;
+      var userParsedSurvey = parseSurvey(userSurvey);
+      
+      console.log(userSurveylen)
+      // going through all the fetched candidates from database
+      for(const can of tempCandidateSurveyArray){ 
+        var matchCount = 0;
+        var candidateParsedSurveyArray = parseSurvey(can.survey);
+        var Surveylen = candidateParsedSurveyArray.length;
+        // console.log(can.matchValue + "   " + can.username);
+        for(var i = 0; i < Surveylen; i++){
+          //&& (userSurveylen === Surveylen) is temproray
+          if((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0) && (userSurveylen === Surveylen)){
+            if(candidateParsedSurveyArray[i] !== ""){
+             // console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
+              matchCount++;
+            }
+            else{
+              //console.log("null " + " === " + " null")
+            }
+          }
+        }
+        can.matchValue = matchCount;
+        //console.log(can.matchValue + "   " + can.username);
+      }
+
+      var bc = [];
+      for(const can of tempCandidateSurveyArray){
+          bc.push({'matchValue' : can.matchValue, 'name' : can.username});
+      }
+      bc.sort((a, b) => a - b);
+      //console.log(JSON.stringify(bc[bc.length-1]));
     if(tempCandidateSurveyArray){
-      setCandidateSurvey(tempCandidateSurveyArray);
+      setBestCandidates(bc[bc.length-1].name);
     }
     else{
       console.log("failed to set results");
     }
-    
-     // await findCandidateMatch(userSurvey, allCandidates);
     }
+
     getUserSurvey();
-    console.log(isCandidate);
-    if(!isCandidate){
-      fetchAllCandidatesAndData(10);
-    }
-    //fetchAllCandidatesAndData(10);
-  }, [userSurvey, isCandidate, candidateSurveyArray]);
+
+    fetchAllCandidatesAndData(50);
+  }, [userSurvey, isCandidate, candidateSurveyArray, bestCandidates]);
   
   const fetchSurvey = async (sub) => {
     try {
@@ -115,35 +152,6 @@ function Dashboard() {
     }
   }
 
-  function findCandidateMatch(candidate){
-    //console.log("VOTER: " + parseSurvey(userSurvey));
-    var matchCount = 0;
-    var count = 1;
-    var userSurveylen = parseSurvey(userSurvey).length;
-    var userParsedSurvey = parseSurvey(userSurvey);
-    console.log(userSurveylen)
-    for(const can of candidate){
-      var candidateParsedSurveyArray = parseSurvey(can.survey);
-      //console.log(candidateParsedSurveyArray);
-      var Surveylen = candidateParsedSurveyArray.length;
-      for(var i = 0; i < Surveylen; i++){
-        if((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0) && (userSurveylen === Surveylen)){
-          
-          if(candidateParsedSurveyArray[i] !== ""){
-            console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
-            matchCount++;
-          }
-          else{
-            console.log("null " + " === " + " null")
-          }
-        }
-      }
-      can.matchValue = matchCount;
-      console.log(can.matchValue);
-      count++;
-    }
-  }
-  
   function parseSurvey(survey) {
     //console.log(survey);
     var surveyArray = '' + survey;
@@ -155,6 +163,7 @@ function Dashboard() {
     const theArray = surveyArray.split('","');
     //console.log(theArray);
     return theArray;
+    //{parseSurvey(candidateSurveyArray).map(txt => <p>{txt}</p>)}
   }
 
   return (userGroup !== 'admin') ? (
@@ -185,7 +194,7 @@ function Dashboard() {
       <div>
         <h2>Survey results:</h2>
         <div>
-          {parseSurvey(userSurvey).map(txt => <p>{txt}</p>)}
+          
         </div>
       </div>
 
@@ -223,11 +232,11 @@ function Dashboard() {
         <div>
           <h2>Survey results:</h2>
           <div>
-            {parseSurvey(userSurvey).map(txt => <p>{txt}</p>)}
+           
           </div>
-          <h2>candidate matches:</h2>
+          <h2>Best Candidate Matches:</h2>
           <div>
-            {parseSurvey(candidateSurveyArray).map(txt => <p>{txt}</p>)}
+         {<p>{JSON.stringify(bestCandidates)}</p>}
           </div>
         </div>
 
