@@ -7,6 +7,7 @@ import Dashboard from './Dashboard';
 import CandidateVerification from './CandidateVerification';
 import Survey from './Survey';
 import Admin from './Admin';
+import AboutCandidate from './AboutCandidate';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/candidate-verification" component={CandidateVerification}/>
           <Route path="/survey" component={Survey}/>
           <Route path="/admin" component={Admin}/>
+          <Route path="/aboutcandidate" component={AboutCandidate}/>
         </Switch>
       </div>
     </Router>

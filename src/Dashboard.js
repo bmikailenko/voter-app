@@ -70,6 +70,7 @@ function Dashboard() {
       {(isCandidate) ?
         (<div>
           You are a candidate
+          <Link to="/aboutcandidate">aboutcandidate page</Link>
         </div>)
         :
         (<div>
@@ -103,6 +104,7 @@ function Dashboard() {
         {(isCandidate) ?
           (<div>
             You are a candidate
+            <div><Link to="/aboutcandidate">aboutcandidate page</Link></div>
           </div>)
           :
           (<div>
