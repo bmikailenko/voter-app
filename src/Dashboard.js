@@ -187,9 +187,13 @@ function Dashboard() {
         <Link to="/survey">Survey</Link>
       </div>
 
-      <div>
-        <Link to="/candidate-verification">Are you a candidate?</Link>
-      </div>
+      {(isCandidate) ?
+        (<div>
+        </div>)
+        :
+        (<div>
+          <Link to="/candidate-verification">Are you a candidate?</Link>
+        </div>)}
 
       <div>
         <h2>Survey results:</h2>
