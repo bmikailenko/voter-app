@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import "survey-react/survey.css";
 import "./AboutCandidate.css";
 import './App.css';
+import default_pfp from './default-pfp-avatar.webp';
 
 
 function AboutCandidate() {
@@ -22,6 +23,12 @@ function AboutCandidate() {
         console.log( candidateName);
         console.log( candidateDesc);
     }
+
+    // file inputting functions (image uploads)
+    // $("#profileImage").on("click", function(e) {
+    //     $("#imageUpload").on();
+    // });
+
     return (
         <div class="candidate-profile-page">
             <h2 class="heading">Profile Setup</h2>
@@ -49,16 +56,29 @@ function AboutCandidate() {
                                 This box is optional for a quick overview for which party you most align with.
                             </div>
                         </div>
-                        
-                        <button>Submit</button>
+                        <br></br>
+                        <button class="update-button">Update Profile</button>
                     </form>
                 </div>
                 <div class="fileInput">
-                    <label for="pfp">Profile Picture: </label><br></br>
-                    <input type="file"></input><br></br>
-                    <label for="document">Documentation: </label><br></br>
-                    <input type="file"></input><br></br>
-                    <input type="submit" value="submit"></input>
+                    {/* <svg viewBox="0 0 16 16" fill="none" width="64" height="64">
+                        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" vector-effect="non-scaling-stroke"></circle>
+                        <path d="M15 8a7.002 7.002 0 00-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+                            <animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"></animateTransform>
+                    </svg> */}
+                    <div>Profile Picture</div>
+                    <label for="pfp" class="pfp-upload">
+                        <img src={default_pfp} width="120"/>
+                        <input id="pfp" type="file"></input>
+                    </label>
+                    <br></br><br></br><br></br>
+                    <label for="document" class="doc-upload">
+                        Documentation
+                        <input id="document" type="file"></input>
+                    </label>
+                    <div class="note">
+                        Insert necessary file for review to determine eligibility for VoterApp.
+                    </div>
                 </div>
 
             </div>

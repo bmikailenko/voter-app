@@ -13,6 +13,35 @@
     border-bottom: 1px solid #e1e4e8;
 }
 
+input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+.pfp-upload {
+    width: 80px;
+    cursor: pointer;
+}
+
+.doc-upload {
+    color: white;
+    display: inline-block;
+    background: #1CB6E0;
+    border: none;
+    padding: 7px 15px;
+    font-weight: 700;
+    border-radius: 3px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 10pt;
+  }
+
 .inputContainer {
     display: flex;
     align-items: stretch;
@@ -20,11 +49,12 @@
 }
 
 .fileInput {
-    width: 33%;
+    text-align: center;
+    width: 40%;
 }
 
 .textInput {
-    width: 66%;
+    width: 60%;
 }
 
 .form-group {
@@ -40,6 +70,14 @@
     background-color: #f5f5f5;
     border: 1px solid #e1e4e8;
     
+}
+
+.update-button {
+    padding: 5px 16px;
+    border-radius: 6px;
+    color: #ffffff;
+    background-color: #2ea44f;
+    border-color: 
 }
 
 .note {
