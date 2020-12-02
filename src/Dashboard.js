@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
-import { Auth, API, graphqlOperation } from 'aws-amplify';
+import { Auth, API, graphqlOperation} from 'aws-amplify';
 import { getSurvey } from './graphql/queries';
 import { Link } from 'react-router-dom';
 import "survey-react/survey.css";
 import './App.css';
+//import { ListGroup } from 'react-bootstrap';
 
 function Dashboard() {
   var [userSurvey, setUserSurvey] = useState();
   var [userGroup, setUserGroup] = useState(null);
   var [isCandidate, setIsCandidate] = useState(false);
+
 
   useEffect(() => {
     const getUserSurvey = async () => {
@@ -22,6 +24,7 @@ function Dashboard() {
       } else {
         console.log("no user survey yet!");
       }
+      
       if(group !== undefined){
         if (group.includes('candidate')) {
           setIsCandidate(true);
@@ -45,6 +48,7 @@ function Dashboard() {
       console.log(e);
     }
   }
+
   function parseSurvey(survey) {
     var surveyArray = '' + survey;
     var arrey = surveyArray.split('"1.)', 1);
