@@ -1,0 +1,51 @@
+.candidate-profile-page {
+    margin: auto;
+    width: 50%;
+    text-align: left;
+}
+
+.heading {
+    font-size: 24px;
+    font-weight: 400;
+    padding: 5px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e1e4e8;
+}
+
+.inputContainer {
+    display: flex;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+.fileInput {
+    width: 33%;
+}
+
+.textInput {
+    width: 66%;
+}
+
+.form-group {
+    margin: 0 0 15px;
+}
+
+.text-box {
+    font-family: inherit;
+    width: 440px;
+    padding: 5px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+    border: 1px solid #e1e4e8;
+    
+}
+
+.note {
+    padding: 5px;
+    min-height: 17px;
+    margin: 4px 0 2px;
+    font-size: 12px;
+    color: #586069;
+}
