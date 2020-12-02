@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom';
+import ReactS3 from 'react-s3';
 import {Storage} from 'aws-amplify';
 import './App.css';
 import './verification.css';
@@ -7,28 +8,34 @@ import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 
 
 function CandidateVerification() {
+	var [userFile, setUserFile] = useState(null);
+	var [hasFile, setHasFile] = useState(false);
+	var [fileSubmitted, setFileSubmitted] = useState(false); 
 
 	const uploadHandler = async (e) => {
 
 
-	    const file = e.target.files[0];
+/*
 	    try {
-
-	      // Upload the file to s3 with private access level. 
-	      await Storage.put('picture.jpg', file, {
-	        level: 'private',
-	        contentType: 'image/jpg'
-	      });
+	      // Upload the file to s3. 
+	      ReactS3.upload( userFile )
+	      .then( (data)=>{
+	      	console.log(data);
+	      })
 
 	    } catch (err) {
 	      console.log(err);
 	    }
-
-
+*/
+		setFileSubmitted(true);
+		console.log("File submitted");
 	}
 
 
-
+	function newFileHandler(e){
+		setHasFile({value: true})
+		setUserFile({value: e.target.files[0]})
+	}
 
 
 	return (
@@ -51,8 +58,25 @@ function CandidateVerification() {
     	<br/>
     	<br/>
 
-        <input type="file"/>
-      	<button onClick={uploadHandler}>Upload selected images</button>
+        <input 
+        type="file" 
+        onChange={newFileHandler}
+        />
+
+        <button 
+        onClick={uploadHandler}
+        disabled={!hasFile}>
+        Upload verification document
+        </button>
+
+        <br/><br/>
+        {(fileSubmitted) ?
+        (<p style={{ color: 'green' }}>
+          Thank you for your submission!
+        </p>)
+        :
+        (<div>
+        </div>)}
 	</div>
   );
 }
