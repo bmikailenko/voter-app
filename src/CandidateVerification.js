@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {Link} from 'react-router-dom';
 import ReactS3, { uploadFile } from 'react-s3';
-import {Storage} from 'aws-amplify';
 import './App.css';
 import './verification.css';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 
 
 function CandidateVerification() {
+
+
+	const config = {
+	    bucketName: 'amplify-voterapp-dev-125905-deployment',
+	    dirName: 'candidate-submissions',
+	    region: 'us-east-2',
+	}
+
 	var [userFile, setUserFile] = useState(null);
 	var [hasFile, setHasFile] = useState(false);
 	var [fileSubmitted, setFileSubmitted] = useState(false); 
@@ -15,10 +22,10 @@ function CandidateVerification() {
 	const uploadHandler = async (e) => {
 
 
-/*
+
 	    try {
 	      // Upload the file to s3. 
-	      ReactS3.uploadFile( userFile )
+	      ReactS3.uploadFile( userFile , config )
 	      .then( (data)=>{
 	      	console.log(data);
 	      })
@@ -26,7 +33,7 @@ function CandidateVerification() {
 	    } catch (err) {
 	      console.log(err);
 	    }
-*/
+
 
 		setFileSubmitted(true);
 		console.log("File submitted");
