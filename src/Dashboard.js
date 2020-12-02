@@ -128,7 +128,7 @@ function Dashboard() {
           bc.push({'matchValue' : can.matchValue, 'name' : can.username});
       }
       bc.sort((a, b) => a - b);
-      //console.log(JSON.stringify(bc[bc.length-1]));
+    // setting the candidate survey to match the best fit candidate
     if(tempCandidateSurveyArray){
       setBestCandidates(bc[bc.length-1].name);
     }
