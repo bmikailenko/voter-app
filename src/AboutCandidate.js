@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { getSurvey } from './graphql/queries';
+import {updateSurvey} from './graphql/mutations';
 import { Link } from 'react-router-dom';
 import "survey-react/survey.css";
 import "./AboutCandidate.css";
@@ -10,18 +11,53 @@ import default_pfp from './default-pfp-avatar.webp';
 
 
 function AboutCandidate() {
-    var [candidateName, setCandidateName] = useState('');
-    var [candidateDesc, setCandidateDesc] = useState('');
+    var [candidateName, setCandidateName] = useState();
+    var [updateCandName, setUpdateCandName] = useState();
+    
+    var [candidateDesc, setCandidateDesc] = useState();
+    var [updateCandDesc, setUpdateCandDesc] = useState();
+    useEffect(() => {
+        const getCandName = async () => {
+            const user = await Auth.currentUserInfo();
+            const sub = await user.attributes.sub;
+            const dbdata = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
+            if (!!dbdata.data.getSurvey.candidateName) {
+                console.log(dbdata.data.getSurvey.candidateName);
+                setCandidateName(await dbdata.data.getSurvey.candidateName);
+            } else {
+                setCandidateName("No name provided");
+                console.log("no name");
+            }
+            if(!!dbdata.data.getSurvey.candidateDesc){
+                setCandidateDesc(dbdata.data.getSurvey.candidateDesc);
+            } else {
+                setCandidateDesc("No description provided");
+            }
+        }
+        getCandName();
+    }, [candidateName]);
     const updateName = (e) => {
-        setCandidateName(e.target.value);
+        console.log(e.target.value);
+        setUpdateCandName(e.target.value);
     }
     const updateDesc = (e) => {
-        setCandidateDesc(e.target.value);
+        console.log(e.target.value);
+        setUpdateCandDesc(e.target.value);
     }
-    const submitForm = (e) => {
+    const submitForm = async (e) => {
         e.preventDefault();
-        console.log( candidateName);
-        console.log( candidateDesc);
+        try {
+            const user = await Auth.currentUserInfo();
+            const sub = await user.attributes.sub;
+            const name = '' + updateCandName;
+            const description = '' + updateCandDesc;
+            const graphqlEntry = { 'id': sub, 'candidateName': name, 'candidateDesc': description };
+            await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
+            setCandidateName(name);
+            setCandidateDesc(description);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     // file inputting functions (image uploads)
@@ -31,6 +67,8 @@ function AboutCandidate() {
 
     return (
         <div class="candidate-profile-page">
+            <h2>{candidateName}</h2>
+                    <h3>{candidateDesc}</h3>
             <h2 class="heading">Profile Setup</h2>
             <div class="inputContainer">
                 <div class="textInput">
@@ -87,4 +125,4 @@ function AboutCandidate() {
     );
 }
 
-export default AboutCandidate;
+export default withAuthenticator(AboutCandidate);
