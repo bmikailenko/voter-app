@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom';
-import ReactS3 from 'react-s3';
+import ReactS3, { uploadFile } from 'react-s3';
 import {Storage} from 'aws-amplify';
 import './App.css';
 import './verification.css';
@@ -18,7 +18,7 @@ function CandidateVerification() {
 /*
 	    try {
 	      // Upload the file to s3. 
-	      ReactS3.upload( userFile )
+	      ReactS3.uploadFile( userFile )
 	      .then( (data)=>{
 	      	console.log(data);
 	      })
@@ -27,6 +27,7 @@ function CandidateVerification() {
 	      console.log(err);
 	    }
 */
+
 		setFileSubmitted(true);
 		console.log("File submitted");
 	}
@@ -71,9 +72,13 @@ function CandidateVerification() {
 
         <br/><br/>
         {(fileSubmitted) ?
-        (<p style={{ color: 'green' }}>
-          Thank you for your submission!
-        </p>)
+        (<div>	
+        	<div style={{ color: 'green' }}>
+          	Thank you for your submission! <br/>
+         	<Link to="/dashboard">Return to Dashboard</Link>
+         	</div>
+         </div> 
+         )
         :
         (<div>
         </div>)}
