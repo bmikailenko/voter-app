@@ -14,21 +14,22 @@ function Dashboard() {
   var [candidateSurveyArray, setCandidateSurvey] = useState();
   var [bestCandidates, setBestCandidates] = useState();
   // getting all the candidates of the database ready for comparison
-  async function listGroups(sub) {
-    const apiName = 'AdminQueries';
-    const path = '/listGroupsForUser';
-    const myInit = {
-      queryStringParameters: {
-        "username": sub,
-      },
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
-      }
-    }
-    const value = await API.get(apiName, path, myInit);
-    return value.Groups;
-  }
+  // async function listGroups(sub) {
+  //   const apiName = 'AdminQueries';
+  //   const path = '/listGroupsForUser';
+  //   const myInit = {
+  //     queryStringParameters: {
+  //       "username": sub,
+  //     },
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
+  //     }
+  //   }
+  //   const value = await API.get(apiName, path, myInit);
+  //   console.log("groups listed", value.Groups);
+  //   return value.Groups;
+  // }
   useEffect(() => {
     const getUserSurvey = async () => {
       const user = await Auth.currentAuthenticatedUser();
@@ -50,92 +51,84 @@ function Dashboard() {
           setUserGroup('admin');
         }
       }
-      //fetchAllCandidatesAndData(10);
     }
     let nextToken;
-    //var allCandidates = [];
     const fetchAllCandidatesAndData = async (limit) => {
-      const apiName = 'AdminQueries';
-      const path = '/listUsers';
-      const myInit = {
-        queryStringParameters: {
-          "limit": limit,
-          "token": nextToken
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
+      try {
+        var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
+        console.log("qlquery", candidatesQlData);
+        var candidateData = candidatesQlData.data.getSurvey.candidateData;
+        var rest = []
+        for (var i = 0; i < candidateData.length; i+=3) {
+          rest.push({'Username': candidateData[i], 'Attributes':[{ 'Name': 'email', 'Value': candidateData.[i+1]}]})
         }
+      } catch (e) {
+        console.log(e);
       }
-      const { NextToken, ...rest } = await API.get(apiName, path, myInit);
-      nextToken = NextToken;
-      //var candidateSurveyArray = [];
-      //var bestCandidates = [];
 
-      var tempCandidateSurveyArray = [];
-      for (const user of rest.Users) {
-        var groups = await listGroups(user.Username);
-        groups = groups.map(function (elem) {
-          return elem.GroupName;
-        }).join(', ');
-        var candidateSurvey = await fetchSurvey(user.Username);
-        //fetch only candidates into the candidate array
-        var emailAsUserName;
-        for(const j of user.Attributes){
-          if(j.Name === "email"){
-            emailAsUserName = j.Value
-            //console.log(j.Value);
-          }
-        }
-        if (groups === 'candidate' || groups === 'candidate, admin' || groups === 'admin, candidate') {
-          if (!candidateSurvey) {
-            candidateSurvey = {'data': 'No Survey!' }
-            tempCandidateSurveyArray.push({ 'username': emailAsUserName, 'survey': candidateSurvey, 'groups': groups, 'matchValue': 0});
-          } else {
-            tempCandidateSurveyArray.push({ 'username': emailAsUserName, 'survey': candidateSurvey.data, 'groups': groups, 'matchValue': 0});
-          }
-        }
-      }
-      //Finding the best match candidate
-      var userSurveylen = parseSurvey(userSurvey).length;
-      var userParsedSurvey = parseSurvey(userSurvey);
-      
-      console.log(userSurveylen)
-      // going through all the fetched candidates from database
-      for(const can of tempCandidateSurveyArray){ 
-        var matchCount = 0;
-        var candidateParsedSurveyArray = parseSurvey(can.survey);
-        var Surveylen = candidateParsedSurveyArray.length;
-        // console.log(can.matchValue + "   " + can.username);
-        for(var i = 0; i < Surveylen; i++){
-          //&& (userSurveylen === Surveylen) is temproray
-          if((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0) && (userSurveylen === Surveylen)){
-            if(candidateParsedSurveyArray[i] !== ""){
-             // console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
-              matchCount++;
+      if (rest.length !== 0) {
+        var tempCandidateSurveyArray = [];
+        for (const user of rest) {
+          var groups = 'candidate';
+          var candidateSurvey = await fetchSurvey(user.Username);
+          //fetch only candidates into the candidate array
+          var emailAsUserName;
+          for(const j of user.Attributes){
+            if(j.Name === "email"){
+              emailAsUserName = j.Value
+              console.log(j.Value);
             }
-            else{
-              //console.log("null " + " === " + " null")
+          }
+          if (groups === 'candidate' || groups === 'candidate, admin' || groups === 'admin, candidate') {
+            if (!candidateSurvey) {
+              candidateSurvey = {'data': 'No Survey!' }
+              tempCandidateSurveyArray.push({ 'username': emailAsUserName, 'survey': candidateSurvey, 'groups': groups, 'matchValue': 0});
+            } else {
+              tempCandidateSurveyArray.push({ 'username': emailAsUserName, 'survey': candidateSurvey.data, 'groups': groups, 'matchValue': 0});
             }
           }
         }
-        can.matchValue = matchCount;
-        //console.log(can.matchValue + "   " + can.username);
-      }
+        //Finding the best match candidate
+        var userSurveylen = parseSurvey(userSurvey).length;
+        var userParsedSurvey = parseSurvey(userSurvey);
+        
+        console.log(userSurveylen)
+        // going through all the fetched candidates from database
+        for(const can of tempCandidateSurveyArray){ 
+          var matchCount = 0;
+          var candidateParsedSurveyArray = parseSurvey(can.survey);
+          var Surveylen = candidateParsedSurveyArray.length;
+          // console.log(can.matchValue + "   " + can.username);
+          for(var i = 0; i < Surveylen; i++){
+            //&& (userSurveylen === Surveylen) is temproray
+            if((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0) && (userSurveylen === Surveylen)){
+              if(candidateParsedSurveyArray[i] !== ""){
+              // console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
+                matchCount++;
+              }
+              else{
+                //console.log("null " + " === " + " null")
+              }
+            }
+          }
+          can.matchValue = matchCount;
+          //console.log(can.matchValue + "   " + can.username);
+        }
 
-      var bc = [];
-      for(const can of tempCandidateSurveyArray){
-          bc.push({'matchValue' : can.matchValue, 'name' : can.username});
+        var bc = [];
+        for(const can of tempCandidateSurveyArray){
+            bc.push({'matchValue' : can.matchValue, 'name' : can.username});
+        }
+        bc.sort((a, b) => a - b);
+      // setting the candidate survey to match the best fit candidate
+      if(tempCandidateSurveyArray){
+        setBestCandidates(bc[bc.length-1].name);
       }
-      bc.sort((a, b) => a - b);
-    // setting the candidate survey to match the best fit candidate
-    if(tempCandidateSurveyArray){
-      setBestCandidates(bc[bc.length-1].name);
-    }
-    else{
-      console.log("failed to set results");
-    }
-    }
+      else{
+        console.log("failed to set results");
+      }
+    }    
+  }
 
     getUserSurvey();
 
@@ -198,7 +191,7 @@ function Dashboard() {
       <div>
         <h2>Survey results:</h2>
         <div>
-          
+
         </div>
       </div>
 
