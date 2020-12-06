@@ -3,4 +3,5 @@ type Survey @model {
   data: String
   candidateName: String
   candidateDesc: String
+  candidateData: [String]
 }
