@@ -6,9 +6,6 @@ export const onCreateSurvey = /* GraphQL */ `
     onCreateSurvey {
       id
       data
-      candidateName
-      candidateDesc
-      candidateData
       createdAt
       updatedAt
     }
@@ -19,9 +16,6 @@ export const onUpdateSurvey = /* GraphQL */ `
     onUpdateSurvey {
       id
       data
-      candidateName
-      candidateDesc
-      candidateData
       createdAt
       updatedAt
     }
@@ -32,9 +26,6 @@ export const onDeleteSurvey = /* GraphQL */ `
     onDeleteSurvey {
       id
       data
-      candidateName
-      candidateDesc
-      candidateData
       createdAt
       updatedAt
     }

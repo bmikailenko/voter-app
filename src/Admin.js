@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
-import { createSurvey, updateSurvey } from './graphql/mutations';
 import { getSurvey } from './graphql/queries';
 import { Link } from 'react-router-dom';
 import "survey-react/survey.css";
@@ -51,7 +50,6 @@ function Admin() {
           userData.push({'username':user.Username, 'survey':userSurvey, 'groups': groups});
         }
       }
-      console.log('userData', userData);
       setUserSurveys(userData);
     }
 
@@ -68,12 +66,10 @@ function Admin() {
     }
   }
 
-  async function addCandidate (sub, survey) {
-
-    // add the user to the 'candidates' pool group
+  async function addCandidate (sub) {
     const apiName = 'AdminQueries';
-    var path = '/addUserToGroup';
-    var myInit = { 
+    const path = '/addUserToGroup';
+    const myInit = { 
       body: {
         "username": sub,
         "groupname": 'candidate',
@@ -84,51 +80,9 @@ function Admin() {
       }
     }
     API.post(apiName, path, myInit);
-
-    // get the candidates username
-    var path = '/getUser';
-    var myInit = { 
-      queryStringParameters: {
-        "username": sub,
-      },
-      headers: {
-        'Content-Type' : 'application/json',
-        Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
-      }
-    }
-    const user = await API.get(apiName, path, myInit);
-    console.log("userAttributes", user.UserAttributes);
-    for (var attributes of user.UserAttributes){
-      console.log("attributes", attributes);
-      if (attributes.Name === "email") {
-        console.log('ping!');
-        var candidateName = attributes.Value;
-      }
-    }
-    console.log("candidateName = ", candidateName);
-
-    // adding candidate to graphql entry with id: 'candidates'
-    try {
-      var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
-      var candidateData = candidatesQlData.data.getSurvey.candidateData;
-      if (candidateData === null) {
-        candidateData = [] 
-      } 
-      if (!candidateData.includes(sub)){
-        candidateData.push(sub);
-        candidateData.push(candidateName);
-        candidateData.push(survey);
-        const graphqlEntry = { 'id': 'candidates', 'candidateData': candidateData };
-        await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
-      }
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   async function removeCandidate (sub) {
-
-    // removing candidate from user pool group
     const apiName = 'AdminQueries';
     const path = '/removeUserFromGroup';
     const myInit = { 
@@ -142,23 +96,6 @@ function Admin() {
       }
     }
     await API.post(apiName, path, myInit);
-
-    // removing candidate from graphQl entry with id: 'candidates'
-    try {
-      var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
-      var candidateData = candidatesQlData.data.getSurvey.candidateData;
-      for (var i = 0; i < candidateData.length; i++) {
-        if (candidateData[i] === sub) {
-          candidateData.splice(i, 3);
-          console.log("piing");
-        }
-      }
-      const graphqlEntry = { 'id': 'candidates', 'candidateData': candidateData };
-      console.log("aftgraphqlEntry", graphqlEntry);
-      await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   async function listGroups (sub) {
@@ -212,7 +149,7 @@ function Admin() {
                   Groups: {user.groups}
                 </td>
                 <td>
-                  <button onClick={() => addCandidate(user.username, user.survey.data)}>Add to Candidates</button>
+                  <button onClick={() => addCandidate(user.username)}>Add to Candidates</button>
                 </td>
                 <td>
                   <button onClick={() => removeCandidate(user.username)}>Remove from Candidates</button>
