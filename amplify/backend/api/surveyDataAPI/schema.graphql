@@ -1,6 +1,6 @@
 type Survey @model {
   id: ID!
-  data: String
+  data: [String]
   candidateName: String
   candidateDesc: String
   candidateData: [String]
