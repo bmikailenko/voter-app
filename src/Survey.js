@@ -2000,7 +2000,7 @@ function Survey() {
       const sub = await user.attributes.sub;
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
       if (surveyData.data.getSurvey !== null) {
-        const userSurvey = await await surveyData.data.getSurvey.data;
+        const userSurvey = await surveyData.data.getSurvey.data;
         if (userSurvey) {
           setUserSurvey(userSurvey)
         } else {
@@ -2019,6 +2019,7 @@ function Survey() {
       const user = await Auth.currentUserInfo();
       const sub = await user.attributes.sub;
       const graphqlEntry = { 'id': sub, 'data': newSurvey };
+      console.log("ENTRY",graphqlEntry);
       if (!userSurvey) {
         await API.graphql(graphqlOperation(createSurvey, { input: graphqlEntry }));
       } else {

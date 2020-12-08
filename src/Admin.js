@@ -12,7 +12,10 @@ function Admin() {
   var [userSurveys, setUserSurveys] = useState();
 
   useEffect(() => {
-    const getUserSurvey = async () => {
+
+    // function checks if user is admin
+    // then runs getAllUsersAndData() if user is admin
+    const isAdmin = async () => {
       const user = await Auth.currentAuthenticatedUser();
       const group = await user.signInUserSession.idToken.payload['cognito:groups'];
       if (group.includes('admin')) {
@@ -21,8 +24,12 @@ function Admin() {
       }
     }
 
+    // function gets all the users data
     let nextToken;
     const getAllUsersAndData = async (limit) => {
+
+      // query gets a list of all the users (10)
+      // use nextToken to get the next 10 users
       const apiName = 'AdminQueries';
       const path = '/listUsers';
       const myInit = { 
@@ -36,38 +43,69 @@ function Admin() {
           }
       }
       const { NextToken, ...rest } =  await API.get(apiName, path, myInit);
-      nextToken = NextToken;
+      nextToken = NextToken; // next token if there are 10+ users in database
+
+      // array of the all the users data 
+      // ex: [{username, survey, groups}{username, survey, groups}]
       var userData = [];
       for (const user of rest.Users) {
+
+        // get the users groups
         var groups = await listGroups(user.Username);
+
+        // format result from listGroups() to seperate by commas
         groups = groups.map(function(elem){
           return elem.GroupName;
         }).join(', ');
+
+        // get the users survey
         var userSurvey = await fetchSurvey(user.Username);
+
+
         if (!userSurvey) {
           userSurvey = {'data':'No Survey!'}
+
+          // add to the array of all users data
           userData.push({'username':user.Username, 'survey':userSurvey, 'groups': groups});
         } else {
-          userData.push({'username':user.Username, 'survey':userSurvey, 'groups': groups});
+
+          // add to the array of all users data
+          userData.push({'username':user.Username, 'survey': {'data': userSurvey}, 'groups': groups});
         }
       }
-      console.log('userData', userData);
+
+      // set the useState variable userSurveys to array of all users data
       setUserSurveys(userData);
     }
 
-    getUserSurvey();
+    // need to run isAdmin() here at the end of useEffect()
+    // so that isAdmin() runs everytime the /admin page refreshes
+    // otherwise we are just declaring the functions and not executing them
+    isAdmin();
+
+    // useEffect() is executed whenever the userGroup variable is manipulated
   },[userGroup]);
 
+
+  // function gets the user survey 
+  // input: 'id'
+  // output: 'array'
   const fetchSurvey = async (sub) => {
     try {
       const surveyData = await API.graphql(graphqlOperation(getSurvey, {id: sub}));
-      const survey = await surveyData.data.getSurvey;
-      return survey;
+      if (surveyData.data.getSurvey) {
+        const survey = await surveyData.data.getSurvey.data;
+        return survey;
+      } else {
+        return null;
+      }
     } catch (e) {
       console.log(e);
     }
   }
 
+  // function adds a user as a candidate
+  // also adds user to the 'candidates' graphql entry
   async function addCandidate (sub, survey) {
 
     // add the user to the 'candidates' pool group
@@ -97,15 +135,11 @@ function Admin() {
       }
     }
     const user = await API.get(apiName, path, myInit);
-    console.log("userAttributes", user.UserAttributes);
     for (var attributes of user.UserAttributes){
-      console.log("attributes", attributes);
       if (attributes.Name === "email") {
-        console.log('ping!');
         var candidateName = attributes.Value;
       }
     }
-    console.log("candidateName = ", candidateName);
 
     // adding candidate to graphql entry with id: 'candidates'
     try {
@@ -126,6 +160,8 @@ function Admin() {
     }
   }
 
+  // function removes a user from the 'candidates' pool group
+  // also removes them from the 'candidates' graphql entry
   async function removeCandidate (sub) {
 
     // removing candidate from user pool group
@@ -150,17 +186,16 @@ function Admin() {
       for (var i = 0; i < candidateData.length; i++) {
         if (candidateData[i] === sub) {
           candidateData.splice(i, 3);
-          console.log("piing");
         }
       }
       const graphqlEntry = { 'id': 'candidates', 'candidateData': candidateData };
-      console.log("aftgraphqlEntry", graphqlEntry);
       await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
     } catch (e) {
       console.log(e);
     }
   }
 
+  // function lists the groups for a user
   async function listGroups (sub) {
     const apiName = 'AdminQueries';
     const path = '/listGroupsForUser';
@@ -175,6 +210,113 @@ function Admin() {
     }
     const value =  await API.get(apiName, path, myInit);
     return value.Groups;
+  }
+
+  // finds the best candidate for a voter from a list of candidates
+  // returns: the candidates survey
+  function bestMatch(voter, candidates) {
+    const voterSurvey = voter.survey.data;
+    var bestMatch = null;
+    var score = 0;
+    var prevScore = 0;
+
+    candidates.forEach(candidate => {
+      var candidateSurvey = candidate.survey.data;
+      console.log('candidate surveys', candidateSurvey);
+      
+      // add to score if candidate answered similarly to voter
+      candidateSurvey.forEach((question, index) => {
+        if (question === voterSurvey[index])
+          score += 1;
+      });
+
+      if (score > prevScore) {
+        bestMatch = candidate;
+        prevScore = score;
+      }
+    });
+
+    return bestMatch;
+  }
+
+  // function compares 'voter' users with 'candidate' users
+  // and organizes them by zipcode
+  function mineData(userData) {
+    if (userData) {
+      var candidates = []; // candidates
+      var voters = [];     // voters
+      var zipcodes = [];   // zipcodes
+
+      // ex: {{zipcode, candidate_username: number_of_voters, candidate_username: number_of_voters}, 
+      //      {zipcode, candidate_username: number_of_voters, candidate_username: number_of_voters}, 
+      //          etc...}
+      //
+      // top candidates at a zipcode is decided by:
+      //    - comparing each candidate with each voters survey
+      //    - deciding which candidates survey is the best match
+      //    - having the most number of best matches at a zipcode
+      var topCandidatesAtZipcode = {};
+
+      // seperate candidates from voters
+      userData.forEach(user => {
+        if (user.groups.includes('candidate') && user.survey.data !== 'No Survey!') {
+          candidates.push(user);
+          zipcodes.push(user.survey.data[2]);
+        }
+        if (user.groups.includes('voter') && user.survey.data !== 'No Survey!') {
+          voters.push(user);
+          zipcodes.push(user.survey.data[2]);
+        }
+      });
+
+      // uncomment to debug
+      // console.log('candidates', candidates);
+      // console.log('voters', voters);
+      // console.log('zipcodes', zipcodes);
+
+      voters.forEach(voter => {
+        
+        // get the voteres zipcode
+        var voterZipcode = voter.survey.data[2];
+
+        // get the voters best match candidate
+        var bestMatch = bestMatch(voter, candidates);
+
+        var bestMatchUsername = bestMatch.username;
+
+        // 
+        // adding to the array
+        //
+
+        // case 1: this is the first voter in that zipcode
+        if (!(voterZipcode in topCandidatesAtZipcode)) {
+          topCandidatesAtZipcode.push(
+            {
+              'zipcode' : voterZipcode,
+              bestMatchUsername : 1
+            }
+          )
+        } else {
+
+        // case 2: this isn't the first voter at the zipcode
+        //         but is a new candidate at that zipcode
+          if (!(bestMatchUsername in topCandidatesAtZipcode.voterZipcode)) {
+            topCandidatesAtZipcode.voterZipcode.push(
+              {
+                bestMatchUsername : 1
+              }
+            )
+
+        // case 3: this isn't the first voter at the zipcode
+        //         and its an existing candidate
+          } else {
+            topCandidatesAtZipcode.voterZipcode.bestMatchUsername += 1;
+          }
+        } 
+      });
+
+      return topCandidatesAtZipcode;
+    }
   }
 
   return (userGroup !== 'admin') ? (
@@ -197,7 +339,7 @@ function Admin() {
               User Sub
             </td>
             <td>
-              User Survey Data
+              User Groups
             </td>
           </tr>
         </thead>
@@ -217,9 +359,6 @@ function Admin() {
                 <td>
                   <button onClick={() => removeCandidate(user.username)}>Remove from Candidates</button>
                 </td>
-                <td>
-                  {user.survey.data}
-                </td>
               </tr>
             </React.Fragment> 
           ))) : (
@@ -229,6 +368,11 @@ function Admin() {
               </td>
             </tr>
           )}
+          <tr>
+            <td>
+              {() => mineData(userSurveys)}
+            </td>
+          </tr>
         </tbody>    
       </table>
     </div>
