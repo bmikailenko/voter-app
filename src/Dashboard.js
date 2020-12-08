@@ -8,7 +8,7 @@ import './App.css';
 //import { ListGroup } from 'react-bootstrap';
 
 function Dashboard() {
-  var [userSurvey, setUserSurvey] = useState();
+  var [userSurvey, setUserSurvey] = useState([]);
   var [userGroup, setUserGroup] = useState(null);
   var [isCandidate, setIsCandidate] = useState(false);
   var [candidateSurveyArray, setCandidateSurvey] = useState();
@@ -89,14 +89,14 @@ function Dashboard() {
           }
         }
         //Finding the best match candidate
-        var userSurveylen = parseSurvey(userSurvey).length;
-        var userParsedSurvey = parseSurvey(userSurvey);
+        var userSurveylen = userSurvey.length;
+        var userParsedSurvey = userSurvey;
         
         console.log(userSurveylen)
         // going through all the fetched candidates from database
         for(const can of tempCandidateSurveyArray){ 
           var matchCount = 0;
-          var candidateParsedSurveyArray = parseSurvey(can.survey);
+          var candidateParsedSurveyArray = can.survey;
           var Surveylen = candidateParsedSurveyArray.length;
           // console.log(can.matchValue + "   " + can.username);
           for(var i = 0; i < Surveylen; i++){
@@ -143,20 +143,6 @@ function Dashboard() {
     } catch (e) {
       console.log(e);
     }
-  }
-
-  function parseSurvey(survey) {
-    //console.log(survey);
-    var surveyArray = '' + survey;
-    var arrey = surveyArray.split('"1.)', 1);
-    var newArray = arrey[0];
-    //Remove the zipcode from display
-    surveyArray = surveyArray.replace(newArray + '"', '');
-    surveyArray = surveyArray.replace('"]', '');
-    const theArray = surveyArray.split('","');
-    //console.log(theArray);
-    return theArray;
-    //{parseSurvey(candidateSurveyArray).map(txt => <p>{txt}</p>)}
   }
 
   return (userGroup !== 'admin') ? (

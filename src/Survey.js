@@ -2036,43 +2036,34 @@ function Survey() {
     } else {
       resultData.push('voter');
     }
-    console.log(survey);
     for (var key in survey.data) {
       var question = survey.getQuestionByValueName(key);
-     // console.log(survey.data);
-      if (question) {
+      if (!!question) {
         var item = { value: question.value };
         item.title = question.title;
-
         item.displayValue = question.displayValue
       }
-      else{
-        // var item = { value: question.value };
-        // item.title = question.title;
-        console.log(question.title + ": No Answer");
-        // item.displayValue = question.displayValue
-      }
-      resultData.push(item.title);
-      resultData.push(item.displayValue);
+      resultData.push( '' + item.title);
+      resultData.push( '' + item.displayValue);
     }
     return resultData;
   }
   function onComplete(survey) {
-    var data = survey.data;
-        var questions = survey.getAllQuestions();
-        for(var i = 0; i < questions.length; i ++) {
-          var key = questions[i].getValueName();
-          if(!data[key]) data[key] = null;
-        }
-        survey.data = data;
+    // var data = survey.data;
+    //     var questions = survey.getAllQuestions();
+    //     for(var i = 0; i < questions.length; i ++) {
+    //       var key = questions[i].getValueName();
+    //       if(!data[key]) data[key] = null;
+    //     }
+    //     survey.data = data;
    // console.log(JSON.stringify())
-    console.log("The results are:" + JSON.stringify(survey.data));
+    // console.log("The results are:" + JSON.stringify(survey.data));
    // const newSurvey = survey.data;
     //console.log(isCandidate);
   
-    console.log("The changes:" +  JSON.stringify(survey));
-    const modSurvey = JSON.stringify(modifySurveyResults(survey));
-    //console.log(modSurvey);
+    // console.log("The changes:" +  JSON.stringify(survey));
+
+    const modSurvey = modifySurveyResults(survey);
     updateUserSurvey(modSurvey);
     setUserSurvey(modSurvey);
   }
