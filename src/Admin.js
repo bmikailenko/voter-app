@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { updateSurvey } from './graphql/mutations';
 import { getSurvey } from './graphql/queries';
 import { Link } from 'react-router-dom';
+import { Button, Spinner } from 'react-bootstrap';
 import "survey-react/survey.css";
 import './App.css';
 
@@ -18,9 +19,11 @@ function Admin() {
     const isAdmin = async () => {
       const user = await Auth.currentAuthenticatedUser();
       const group = await user.signInUserSession.idToken.payload['cognito:groups'];
-      if (group.includes('admin')) {
-        setUserGroup('admin');
-        getAllUsersAndData(50);  
+      if (group !== undefined) {
+        if (group.includes('admin')) {
+          setUserGroup('admin');
+          getAllUsersAndData(50);  
+        }
       }
     }
 
@@ -167,6 +170,8 @@ function Admin() {
     } catch (e) {
       console.log(e);
     }
+
+    window.location.reload(false);
   }
 
   // function removes a user from the 'candidates' pool group
@@ -202,6 +207,8 @@ function Admin() {
     } catch (e) {
       console.log(e);
     }
+
+    window.location.reload(false);
   }
 
   // function lists the groups for a user
@@ -351,7 +358,6 @@ function Admin() {
 
   return (userGroup !== 'admin') ? (
       <div>
-        <AmplifySignOut />
         <div>
           <Link to="/dashboard">Go back to dashboard</Link>
         </div>
@@ -381,20 +387,20 @@ function Admin() {
                   {user.username}
                 </td>
                 <td>
-                  Groups: {user.groups}
+                  {user.groups}
                 </td>
-                <td>
-                  <button onClick={() => addCandidate(user.username, user.survey.data)}>Add to Candidates</button>
+                <td style={{'padding-right': '10px', 'padding-top': '5px'}}>
+                  <Button variant="outline-primary" onClick={() => addCandidate(user.username, user.survey.data)}>Add to Candidates</Button>
                 </td>
-                <td>
-                  <button onClick={() => removeCandidate(user.username)}>Remove from Candidates</button>
+                <td style={{'padding-right': '10px', 'padding-top': '5px'}}>
+                  <Button variant="outline-danger" onClick={() => removeCandidate(user.username)}>Remove from Candidates</Button>
                 </td>
               </tr>
             </React.Fragment> 
           ))) : (
             <tr>
               <td>
-                Loading Data...
+                Loading Data <Spinner animation="border" size="sm" />
               </td>
             </tr>
           )}

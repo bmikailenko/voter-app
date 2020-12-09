@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
-import { Link } from 'react-router-dom';
 import { createSurvey, updateSurvey } from './graphql/mutations';
 import { getSurvey } from './graphql/queries';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import * as SurveyQuestions from "survey-react";
 import './App.css';
 import "survey-react/survey.css";
@@ -2007,7 +2006,7 @@ function Survey() {
           setUserSurvey('You dont have one yet!');
         }
       }
-      if (group !== null) {
+      if (group !== undefined) {
         if (group.includes('candidate')) {
           setIsCandidate(true);
         }
@@ -2052,20 +2051,6 @@ function Survey() {
     return resultData;
   }
   function onComplete(survey) {
-//     var data = survey.data;
-//         var questions = survey.getAllQuestions();
-//         for(var i = 0; i < questions.length; i ++) {
-//           var key = questions[i].getValueName();
-//           if(!data[key]) data[key] = null;
-//         }
-//         survey.data = data;
-//  //  console.log(JSON.stringify())
-//    // console.log("The results are:" + JSON.stringify(survey.data));
-//    const newSurvey = survey.data;
-//    // console.log(isCandidate);
-  
-//    // console.log("The changes:" +  JSON.stringify(survey));
-
     const modSurvey = modifySurveyResults(survey);
     updateUserSurvey(modSurvey);
     setUserSurvey(modSurvey);
@@ -2073,15 +2058,13 @@ function Survey() {
 
   return (
     <div>
-      <AmplifySignOut />
-      <div class="title-section">
+      <div className="title-section">
         <h1>Survey Page</h1>
         <p>Answer as many questions as desired to further express your ideals, policy opinions, and beliefs in any field provided down below.</p>
       </div>
-      <div class="questions">
+      <div className="questions">
         <SurveyQuestions.Survey json={surveyJSON} onComplete={onComplete} />
       </div>
-      <Link to="/dashboard">Dashboard</Link>
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { getSurvey } from './graphql/queries';
 import { Link } from 'react-router-dom';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import "survey-react/survey.css";
 import './App.css';
-//import { ListGroup } from 'react-bootstrap';
 
 function Dashboard() {
   var [userSurvey, setUserSurvey] = useState([]);
@@ -105,7 +105,7 @@ function Dashboard() {
        // console.log(bc);
        
         bc.sort(sortCandidates('matchValue'));
-        console.log(bc);
+        //console.log(bc);
       // setting the candidate survey to match the best fit candidate
       if(tempCandidateSurveyArray){
         setBestCandidates(bc[bc.length-1].name);
@@ -158,82 +158,92 @@ function Dashboard() {
   return (userGroup !== 'admin') ? (
     <div>
 
-      <AmplifySignOut />
+      <Container>
 
-      <h1>My Dashboard</h1>
+        <Row className="justify-content-md-center">
+          <Col md="auto">
+            <h1>My Dashboard</h1>
+          </Col>
+        </Row>
 
-      {(isCandidate) ?
-        (<div>
-          You are a candidate
-          <Link to="/aboutcandidate">about candidate page</Link>
-        </div>)
-        :
-        (<div>
-          You are a voter
-        </div>)}
+        <Row className="justify-content-md-center" style={{'paddingTop': '60px'}}>
+          <Col md="auto">
+            <Button variant="success" href="/survey">Take the Survey</Button>
+          </Col>
+        </Row>
 
-      <div>
-        <Link to="/survey">Survey</Link>
-      </div>
+        <Row style={{'paddingTop': '60px'}}>
+          <Col>
+            <h4>Best Candidate Matches: {JSON.stringify(bestCandidates)}</h4>
+            
+          </Col>
+        </Row>
 
-      {(isCandidate) ?
-        (<div>
-        </div>)
-        :
-        (<div>
-          <Link to="/candidate-verification">Are you a candidate?</Link>
-        </div>)}
+      </Container>
 
-      <div>
-        <h2>Survey results:</h2>
-        <div>
-        
+      <div className="fixed-bottom">
+        {(isCandidate) ?
+                (<div>
+                  
+                  <div>Current user status: candidate<Link to="/aboutcandidate">about candidate page</Link></div>
+                </div>)
+                :
+                (<div>
+                  Current user status: voter
+                </div>)}
+
+                <div>
+                  <Link to="/candidate-verification">Are you a candidate?</Link>
+                </div>
         </div>
-        <h2>best Candidates results:</h2>
-        {<p>{JSON.stringify(bestCandidates)}</p>}
-      </div>
 
     </div>
   ) :
     (
       <div>
 
-        <AmplifySignOut />
+        <Container>
 
-        <h1>My Dashboard</h1>
+          <Row className="justify-content-md-center">
+            <Col md="auto">
+              <h1>My Dashboard</h1>
+            </Col>
+          </Row>
 
-        {(isCandidate) ?
-          (<div>
-            
-            <div>You are a candidate<Link to="/aboutcandidate">about candidate page</Link></div>
-          </div>)
-          :
-          (<div>
-            You are a voter
-          </div>)}
+          <Row className="justify-content-md-center" style={{'paddingTop': '60px'}}>
+            <Col md="auto">
+              <Button variant="success" href="/survey">Take the Survey</Button>
+            </Col>
 
-        <div>
-          <Link to="/survey">Survey</Link>
+            <Col md="auto">
+              <Button variant="secondary" href="/admin">Go to Admin Page</Button>
+            </Col>
+          </Row>
+
+          <Row style={{'paddingTop': '60px'}}>
+            <Col>
+              <h4>Best Candidate Matches: {JSON.stringify(bestCandidates)}</h4>
+            </Col>
+          </Row>
+
+        </Container>
+
+        <div className="fixed-bottom">
+          {(isCandidate) ?
+                  (<div>
+                    
+                    <div>Current user status: candidate<Link to="/aboutcandidate">about candidate page</Link></div>
+                  </div>)
+                  :
+                  (<div>
+                    Current user status: voter
+                  </div>)}
+
+                  <div>
+                    <Link to="/candidate-verification">Are you a candidate?</Link>
+                  </div>
         </div>
-
-        <div>
-          <Link to="/candidate-verification">Are you a candidate?</Link>
-        </div>
-
-        <div>
-          <Link to="/admin">Go to admin page</Link>
-        </div>
-
-        <div>
-          <h2>Survey results:</h2>
-          <div>
-           
-          </div>
-          <h2>Best Candidate Matches:</h2>
-          <div>
-         {<p>{JSON.stringify(bestCandidates)}</p>}
-          </div>
-        </div>
+        
 
       </div>
     );
