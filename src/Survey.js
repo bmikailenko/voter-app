@@ -2052,19 +2052,19 @@ function Survey() {
     return resultData;
   }
   function onComplete(survey) {
-    // var data = survey.data;
-    //     var questions = survey.getAllQuestions();
-    //     for(var i = 0; i < questions.length; i ++) {
-    //       var key = questions[i].getValueName();
-    //       if(!data[key]) data[key] = null;
-    //     }
-    //     survey.data = data;
-   // console.log(JSON.stringify())
-    // console.log("The results are:" + JSON.stringify(survey.data));
-   // const newSurvey = survey.data;
-    //console.log(isCandidate);
+//     var data = survey.data;
+//         var questions = survey.getAllQuestions();
+//         for(var i = 0; i < questions.length; i ++) {
+//           var key = questions[i].getValueName();
+//           if(!data[key]) data[key] = null;
+//         }
+//         survey.data = data;
+//  //  console.log(JSON.stringify())
+//    // console.log("The results are:" + JSON.stringify(survey.data));
+//    const newSurvey = survey.data;
+//    // console.log(isCandidate);
   
-    // console.log("The changes:" +  JSON.stringify(survey));
+//    // console.log("The changes:" +  JSON.stringify(survey));
 
     const modSurvey = modifySurveyResults(survey);
     updateUserSurvey(modSurvey);

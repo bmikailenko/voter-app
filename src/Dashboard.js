@@ -56,11 +56,11 @@ function Dashboard() {
     const fetchAllCandidatesAndData = async (limit) => {
       try {
         var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
-        console.log("qlquery", candidatesQlData);
+        //console.log("qlquery", candidatesQlData);
         var candidateData = candidatesQlData.data.getSurvey.candidateData;
         var rest = []
         for (var i = 0; i < candidateData.length; i+=3) {
-          rest.push({'Username': candidateData[i], 'Attributes':[{ 'Name': 'email', 'Value': candidateData.[i+1]}]})
+          rest.push({'Username': candidateData[i], 'Attributes':[{ 'Name': 'email', 'Value': candidateData[i+1]}]})
         }
       } catch (e) {
         console.log(e);
@@ -76,7 +76,7 @@ function Dashboard() {
           for(const j of user.Attributes){
             if(j.Name === "email"){
               emailAsUserName = j.Value
-              console.log(j.Value);
+              //console.log(j.Value);
             }
           }
           if (groups === 'candidate' || groups === 'candidate, admin' || groups === 'admin, candidate') {
@@ -87,23 +87,25 @@ function Dashboard() {
               tempCandidateSurveyArray.push({ 'username': emailAsUserName, 'survey': candidateSurvey.data, 'groups': groups, 'matchValue': 0});
             }
           }
+          //console.log(tempCandidateSurveyArray);
         }
         //Finding the best match candidate
         var userSurveylen = userSurvey.length;
         var userParsedSurvey = userSurvey;
         
-        console.log(userSurveylen)
+        //console.log(userSurveylen)
         // going through all the fetched candidates from database
         for(const can of tempCandidateSurveyArray){ 
           var matchCount = 0;
           var candidateParsedSurveyArray = can.survey;
+          //console.log(candidateParsedSurveyArray);
           var Surveylen = candidateParsedSurveyArray.length;
           // console.log(can.matchValue + "   " + can.username);
           for(var i = 0; i < Surveylen; i++){
             //&& (userSurveylen === Surveylen) is temproray
-            if((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0) && (userSurveylen === Surveylen)){
+            if((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0)){
               if(candidateParsedSurveyArray[i] !== ""){
-              // console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
+               // console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
                 matchCount++;
               }
               else{
@@ -111,15 +113,18 @@ function Dashboard() {
               }
             }
           }
-          can.matchValue = matchCount;
-          //console.log(can.matchValue + "   " + can.username);
+        can.matchValue = matchCount;
+        //console.log(can.matchValue + "   " + can.username);
         }
 
         var bc = [];
         for(const can of tempCandidateSurveyArray){
             bc.push({'matchValue' : can.matchValue, 'name' : can.username});
         }
-        bc.sort((a, b) => a - b);
+       // console.log(bc);
+       
+        bc.sort(sortCandidates('matchValue'));
+        console.log(bc);
       // setting the candidate survey to match the best fit candidate
       if(tempCandidateSurveyArray){
         setBestCandidates(bc[bc.length-1].name);
@@ -132,9 +137,33 @@ function Dashboard() {
 
     getUserSurvey();
 
-    fetchAllCandidatesAndData(50);
+    
+      fetchAllCandidatesAndData(50);
+    
+    
   }, [userSurvey, isCandidate, candidateSurveyArray, bestCandidates]);
   
+  function sortCandidates(key){
+    return function innerSort(a, b) {
+      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+        // property doesn't exist on either object
+        return 0;
+      }
+    const varA = (typeof a[key] === 'string')
+      ? a[key].toUpperCase() : a[key];
+    const varB = (typeof b[key] === 'string')
+      ? b[key].toUpperCase() : b[key];
+
+    let comparison = 0;
+    if (varA > varB) {
+      comparison = 1;
+    } else if (varA < varB) {
+      comparison = -1;
+    }
+    return comparison
+  }
+}
+
   const fetchSurvey = async (sub) => {
     try {
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
@@ -177,8 +206,10 @@ function Dashboard() {
       <div>
         <h2>Survey results:</h2>
         <div>
-
+        
         </div>
+        <h2>best Candidates results:</h2>
+        {<p>{JSON.stringify(bestCandidates)}</p>}
       </div>
 
     </div>
@@ -192,8 +223,8 @@ function Dashboard() {
 
         {(isCandidate) ?
           (<div>
-            You are a candidate
-            <div><Link to="/aboutcandidate">aboutcandidate page</Link></div>
+            
+            <div>You are a candidate<Link to="/aboutcandidate">about candidate page</Link></div>
           </div>)
           :
           (<div>
