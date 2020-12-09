@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { getSurvey } from './graphql/queries';
-import {updateSurvey} from './graphql/mutations';
-import { Link } from 'react-router-dom';
-import "survey-react/survey.css";
+import {updateSurvey} from './graphql/mutations';import "survey-react/survey.css";
 import "./AboutCandidate.css";
 import './App.css';
 import default_pfp from './default-pfp-avatar.webp';
@@ -106,7 +104,7 @@ function AboutCandidate() {
                     </svg> */}
                     <div>Profile Picture</div>
                     <label for="pfp" class="pfp-upload">
-                        <img src={default_pfp} width="120"/>
+                        <div alt="image" src={default_pfp} width="120"/>
                         <input id="pfp" type="file"></input>
                     </label>
                     <br></br><br></br><br></br>

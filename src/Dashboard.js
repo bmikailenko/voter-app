@@ -11,25 +11,8 @@ function Dashboard() {
   var [userSurvey, setUserSurvey] = useState([]);
   var [userGroup, setUserGroup] = useState(null);
   var [isCandidate, setIsCandidate] = useState(false);
-  var [candidateSurveyArray, setCandidateSurvey] = useState();
   var [bestCandidates, setBestCandidates] = useState();
-  // getting all the candidates of the database ready for comparison
-  // async function listGroups(sub) {
-  //   const apiName = 'AdminQueries';
-  //   const path = '/listGroupsForUser';
-  //   const myInit = {
-  //     queryStringParameters: {
-  //       "username": sub,
-  //     },
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
-  //     }
-  //   }
-  //   const value = await API.get(apiName, path, myInit);
-  //   console.log("groups listed", value.Groups);
-  //   return value.Groups;
-  // }
+
   useEffect(() => {
     const getUserSurvey = async () => {
       const user = await Auth.currentAuthenticatedUser();
@@ -52,11 +35,10 @@ function Dashboard() {
         }
       }
     }
-    let nextToken;
+
     const fetchAllCandidatesAndData = async (limit) => {
       try {
         var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
-        //console.log("qlquery", candidatesQlData);
         var candidateData = candidatesQlData.data.getSurvey.candidateData;
         var rest = []
         for (var i = 0; i < candidateData.length; i+=3) {
@@ -90,7 +72,6 @@ function Dashboard() {
           //console.log(tempCandidateSurveyArray);
         }
         //Finding the best match candidate
-        var userSurveylen = userSurvey.length;
         var userParsedSurvey = userSurvey;
         
         //console.log(userSurveylen)
@@ -101,7 +82,7 @@ function Dashboard() {
           //console.log(candidateParsedSurveyArray);
           var Surveylen = candidateParsedSurveyArray.length;
           // console.log(can.matchValue + "   " + can.username);
-          for(var i = 0; i < Surveylen; i++){
+          for(i = 0; i < Surveylen; i++){
             //&& (userSurveylen === Surveylen) is temproray
             if((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0)){
               if(candidateParsedSurveyArray[i] !== ""){
@@ -141,7 +122,7 @@ function Dashboard() {
       fetchAllCandidatesAndData(50);
     
     
-  }, [userSurvey, isCandidate, candidateSurveyArray, bestCandidates]);
+  }, [userSurvey, isCandidate, bestCandidates]);
   
   function sortCandidates(key){
     return function innerSort(a, b) {

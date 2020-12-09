@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Link} from 'react-router-dom';
-import ReactS3, { uploadFile } from 'react-s3';
+import ReactS3 from 'react-s3';
 import './App.css';
 import './verification.css';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';

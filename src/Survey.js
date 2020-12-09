@@ -2014,7 +2014,7 @@ function Survey() {
       } 
     }
     getUserSurvey();
-  }, [userSurvey, isCandidate]);
+  }, []);
 
   const updateUserSurvey = async (newSurvey) => {
     try {

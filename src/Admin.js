@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
-import { createSurvey, updateSurvey } from './graphql/mutations';
+import { updateSurvey } from './graphql/mutations';
 import { getSurvey } from './graphql/queries';
 import { Link } from 'react-router-dom';
 import "survey-react/survey.css";
@@ -10,7 +10,6 @@ import './App.css';
 function Admin() {
   var [userGroup, setUserGroup] = useState(null);
   var [userSurveys, setUserSurveys] = useState();
-  var [data, setData] = useState();
 
   useEffect(() => {
 
@@ -134,8 +133,8 @@ function Admin() {
     API.post(apiName, path, myInit);
 
     // get the candidates username
-    var path = '/getUser';
-    var myInit = { 
+    path = '/getUser';
+    myInit = { 
       queryStringParameters: {
         "username": sub,
       },
