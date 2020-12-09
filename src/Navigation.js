@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AmplifySignOut } from '@aws-amplify/ui-react';
 import Auth from '@aws-amplify/auth';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, Button } from 'react-bootstrap';
 import './App.css';
 import './Navigation.css'
 
@@ -19,6 +18,11 @@ function Navigation() {
     }
     updateUser();
   },[]);
+
+  function signOut () {
+    Auth.signOut();
+    window.location.reload(false);
+  }
 
   return (!user) ? (
     <Navbar>
@@ -39,7 +43,7 @@ function Navigation() {
         <Nav>
             <Nav.Link href="/about">About</Nav.Link>
             <Nav.Link href="/dashboard">Dashboard</Nav.Link>
-            <AmplifySignOut />
+            <Button variant="outline-secondary" onClick={signOut}>Sign Out</Button>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
