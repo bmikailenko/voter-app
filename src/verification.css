@@ -1,0 +1,6 @@
+ul{
+  padding-left: 20px;
+  list-style-type: disc;
+  display: inline-block;
+  text-align: left;
+}

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
-import { Link } from 'react-router-dom';
 import { createSurvey, updateSurvey } from './graphql/mutations';
 import { getSurvey } from './graphql/queries';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import * as SurveyQuestions from "survey-react";
 import './App.css';
 import "survey-react/survey.css";
@@ -1990,6 +1989,8 @@ function Survey() {
     "progressBarType": "questions",
     "firstPageIsStarted": true
   }
+
+
   useEffect(() => {
     const getUserSurvey = async () => {
       const user = await Auth.currentUserInfo();
@@ -1998,25 +1999,28 @@ function Survey() {
       const sub = await user.attributes.sub;
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
       if (surveyData.data.getSurvey !== null) {
-        const userSurvey = await await surveyData.data.getSurvey.data;
+        const userSurvey = await surveyData.data.getSurvey.data;
         if (userSurvey) {
           setUserSurvey(userSurvey)
         } else {
           setUserSurvey('You dont have one yet!');
         }
       }
-      if (group.includes('candidate')) {
-        setIsCandidate(true);
-      }
+      if (group !== undefined) {
+        if (group.includes('candidate')) {
+          setIsCandidate(true);
+        }
+      } 
     }
     getUserSurvey();
-  }, [userSurvey, isCandidate]);
+  }, []);
 
   const updateUserSurvey = async (newSurvey) => {
     try {
       const user = await Auth.currentUserInfo();
       const sub = await user.attributes.sub;
       const graphqlEntry = { 'id': sub, 'data': newSurvey };
+      console.log("ENTRY",graphqlEntry);
       if (!userSurvey) {
         await API.graphql(graphqlOperation(createSurvey, { input: graphqlEntry }));
       } else {
@@ -2029,43 +2033,38 @@ function Survey() {
   function modifySurveyResults(survey) {
     //modify what data to save into db
     var resultData = [];
+    if (isCandidate) {
+     resultData.push('candidate');
+    } else {
+      resultData.push('voter');
+    }
     for (var key in survey.data) {
       var question = survey.getQuestionByValueName(key);
       if (!!question) {
         var item = { value: question.value };
         item.title = question.title;
-
         item.displayValue = question.displayValue
       }
-      resultData.push(item.title);
-      resultData.push(item.displayValue);
+      resultData.push( '' + item.title);
+      resultData.push( '' + item.displayValue);
     }
     return resultData;
   }
   function onComplete(survey) {
-    console.log("The results are:" + JSON.stringify(survey.data));
-    const newSurvey = survey.data;
-    if (isCandidate) {
-      newSurvey.userGroup = 'candidate';
-    } else {
-      newSurvey.userGroup = 'voter';
-    }
-    const modSurvey = JSON.stringify(modifySurveyResults(survey));;
+    const modSurvey = modifySurveyResults(survey);
     updateUserSurvey(modSurvey);
     setUserSurvey(modSurvey);
   }
 
   return (
     <div>
-      <AmplifySignOut />
-      <div class="title-section">
+      <div className="title-section">
         <h1>Survey Page</h1>
         <p>Answer as many questions as desired to further express your ideals, policy opinions, and beliefs in any field provided down below.</p>
       </div>
-      <div class="questions">
+      <div className="questions">
         <SurveyQuestions.Survey json={surveyJSON} onComplete={onComplete} />
       </div>
-      <Link to="/dashboard">Dashboard</Link>
     </div>
   );
 }
