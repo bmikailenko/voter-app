@@ -20,7 +20,7 @@ function Admin() {
       const group = await user.signInUserSession.idToken.payload['cognito:groups'];
       if (group.includes('admin')) {
         setUserGroup('admin');
-        getAllUsersAndData(10);  
+        getAllUsersAndData(50);  
       }
     }
 
