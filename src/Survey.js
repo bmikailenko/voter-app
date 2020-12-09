@@ -2007,9 +2007,11 @@ function Survey() {
           setUserSurvey('You dont have one yet!');
         }
       }
-      if (group.includes('candidate')) {
-        setIsCandidate(true);
-      }
+      if (group !== null) {
+        if (group.includes('candidate')) {
+          setIsCandidate(true);
+        }
+      } 
     }
     getUserSurvey();
   }, [userSurvey, isCandidate]);

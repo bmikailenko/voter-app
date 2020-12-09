@@ -10,6 +10,7 @@ import './App.css';
 function Admin() {
   var [userGroup, setUserGroup] = useState(null);
   var [userSurveys, setUserSurveys] = useState();
+  var [data, setData] = useState();
 
   useEffect(() => {
 
@@ -20,7 +21,7 @@ function Admin() {
       const group = await user.signInUserSession.idToken.payload['cognito:groups'];
       if (group.includes('admin')) {
         setUserGroup('admin');
-        getAllUsersAndData(10);  
+        getAllUsersAndData(50);  
       }
     }
 
@@ -42,8 +43,16 @@ function Admin() {
             Authorization: `${(await Auth.currentSession()).getAccessToken().getJwtToken()}`
           }
       }
-      const { NextToken, ...rest } =  await API.get(apiName, path, myInit);
+      var { NextToken, ...rest } =  await API.get(apiName, path, myInit);
       nextToken = NextToken; // next token if there are 10+ users in database
+
+      // myInit.queryStringParameters.token = nextToken;
+      // var { NextToken, ...rest } =  await API.get(apiName, path, myInit);
+      // nextToken = NextToken; // next token if there are 10+ users in database
+
+      // myInit.queryStringParameters.token = nextToken;
+      // var { NextToken, ...rest } =  await API.get(apiName, path, myInit);
+      // nextToken = NextToken; // next token if there are 10+ users in database
 
       // array of the all the users data 
       // ex: [{username, survey, groups}{username, survey, groups}]
@@ -75,6 +84,7 @@ function Admin() {
       }
 
       // set the useState variable userSurveys to array of all users data
+      console.log(userData);
       setUserSurveys(userData);
     }
 
@@ -212,33 +222,6 @@ function Admin() {
     return value.Groups;
   }
 
-  // finds the best candidate for a voter from a list of candidates
-  // returns: the candidates survey
-  function bestMatch(voter, candidates) {
-    const voterSurvey = voter.survey.data;
-    var bestMatch = null;
-    var score = 0;
-    var prevScore = 0;
-
-    candidates.forEach(candidate => {
-      var candidateSurvey = candidate.survey.data;
-      console.log('candidate surveys', candidateSurvey);
-      
-      // add to score if candidate answered similarly to voter
-      candidateSurvey.forEach((question, index) => {
-        if (question === voterSurvey[index])
-          score += 1;
-      });
-
-      if (score > prevScore) {
-        bestMatch = candidate;
-        prevScore = score;
-      }
-    });
-
-    return bestMatch;
-  }
-
   // function compares 'voter' users with 'candidate' users
   // and organizes them by zipcode
   function mineData(userData) {
@@ -247,15 +230,15 @@ function Admin() {
       var voters = [];     // voters
       var zipcodes = [];   // zipcodes
 
-      // ex: {{zipcode, candidate_username: number_of_voters, candidate_username: number_of_voters}, 
+      // ex: [{zipcode, candidate_username: number_of_voters, candidate_username: number_of_voters}, 
       //      {zipcode, candidate_username: number_of_voters, candidate_username: number_of_voters}, 
-      //          etc...}
+      //          etc...]
       //
       // top candidates at a zipcode is decided by:
       //    - comparing each candidate with each voters survey
       //    - deciding which candidates survey is the best match
       //    - having the most number of best matches at a zipcode
-      var topCandidatesAtZipcode = {};
+      var topCandidatesAtZipcode = [];
 
       // seperate candidates from voters
       userData.forEach(user => {
@@ -263,9 +246,11 @@ function Admin() {
           candidates.push(user);
           zipcodes.push(user.survey.data[2]);
         }
-        if (user.groups.includes('voter') && user.survey.data !== 'No Survey!') {
-          voters.push(user);
-          zipcodes.push(user.survey.data[2]);
+        else {
+          if (user.survey.data !== 'No Survey!') {
+            voters.push(user);
+            zipcodes.push(user.survey.data[2]);
+          } 
         }
       });
 
@@ -280,43 +265,89 @@ function Admin() {
         var voterZipcode = voter.survey.data[2];
 
         // get the voters best match candidate
-        var bestMatch = bestMatch(voter, candidates);
+        var theBestMatch = bestMatch(voter, candidates);
 
-        var bestMatchUsername = bestMatch.username;
+        var bestMatchUsername = theBestMatch.username;
 
         // 
         // adding to the array
         //
 
         // case 1: this is the first voter in that zipcode
-        if (!(voterZipcode in topCandidatesAtZipcode)) {
+        if (!(topCandidatesAtZipcode.find(o => o.zipcode === voterZipcode))) {
+          console.log("case 1");
+
           topCandidatesAtZipcode.push(
             {
-              'zipcode' : voterZipcode,
-              bestMatchUsername : 1
+              zipcode : voterZipcode,
+              candidates : 
+                {
+                  candidate : bestMatchUsername,
+                  matches : 1
+                }
             }
           )
-        } else {
+        } 
+        else {
 
         // case 2: this isn't the first voter at the zipcode
         //         but is a new candidate at that zipcode
-          if (!(bestMatchUsername in topCandidatesAtZipcode.voterZipcode)) {
-            topCandidatesAtZipcode.voterZipcode.push(
+          if (!(topCandidatesAtZipcode.find(o => o.candidates.candidate === bestMatchUsername))) {
+            topCandidatesAtZipcode[voterZipcode].candidates.push(
               {
-                bestMatchUsername : 1
+                candidate : bestMatchUsername,
+                matches : 1
               }
             )
-
-        // case 3: this isn't the first voter at the zipcode
-        //         and its an existing candidate
-          } else {
-            topCandidatesAtZipcode.voterZipcode.bestMatchUsername += 1;
           }
-        } 
+
+          // case 3: this isn't the first voter at the zipcode
+          //         and its an existing candidate
+          else {
+            console.log("case 3", topCandidatesAtZipcode);
+            //console.log('--', topCandidatesAtZipcode.find(o => o.candidates.candidate === bestMatchUsername));
+            //topCandidatesAtZipcode[voterZipcode][bestMatchUsername] += 1;
+          }
+        }
       });
 
-      return topCandidatesAtZipcode;
-    }
+
+      var returnArray = [];
+      topCandidatesAtZipcode.forEach((zipcode, idx) => {
+        returnArray[idx] = [zipcode.zipcode, Object.values(zipcode.candidates)];
+      });
+
+      console.log(returnArray);
+
+      return returnArray.join(", ");
+    } 
+  }
+
+  // finds the best candidate for a voter from a list of candidates
+  // returns: the candidates survey
+  function bestMatch(voter, candidates) {
+    const voterSurvey = voter.survey.data;
+    var bestMatch = null;
+    var score = 0;
+    var prevScore = 0;
+
+    candidates.forEach(candidate => {
+      var candidateSurvey = candidate.survey.data;
+      // console.log('candidate surveys', candidateSurvey);
+      
+      // add to score if candidate answered similarly to voter
+      candidateSurvey.forEach((question, index) => {
+        if (question === voterSurvey[index])
+          score += 1;
+      });
+
+      if (score > prevScore) {
+        bestMatch = candidate;
+        prevScore = score;
+      }
+    });
+
+    return bestMatch;
   }
 
   return (userGroup !== 'admin') ? (
@@ -370,7 +401,7 @@ function Admin() {
           )}
           <tr>
             <td>
-              {() => mineData(userSurveys)}
+              { mineData(userSurveys) }
             </td>
           </tr>
         </tbody>    
