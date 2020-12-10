@@ -39,6 +39,7 @@ function Dashboard() {
     const fetchAllCandidatesAndData = async (limit) => {
       try {
         var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
+        console.log('got survey, dashboard line 41');
         var candidateData = candidatesQlData.data.getSurvey.candidateData;
         var rest = []
         for (var i = 0; i < candidateData.length; i+=3) {
@@ -119,10 +120,10 @@ function Dashboard() {
     getUserSurvey();
 
     
-      fetchAllCandidatesAndData(50);
+    fetchAllCandidatesAndData(50);
     
     
-  }, [userSurvey, isCandidate, bestCandidates]);
+  }, []);
   
   function sortCandidates(key){
     return function innerSort(a, b) {
@@ -148,6 +149,7 @@ function Dashboard() {
   const fetchSurvey = async (sub) => {
     try {
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
+      console.log("got survey dashboard, line 151");
       const survey = await surveyData.data.getSurvey;
       return survey;
     } catch (e) {

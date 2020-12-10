@@ -130,6 +130,7 @@ function Admin() {
   const fetchSurvey = async (sub) => {
     try {
       const surveyData = await API.graphql(graphqlOperation(getSurvey, {id: sub}));
+      console.log("got survey admin, line 132")
       if (surveyData.data.getSurvey) {
         const survey = await surveyData.data.getSurvey.data;
         return survey;
@@ -181,6 +182,7 @@ function Admin() {
     // adding candidate to graphql entry with id: 'candidates'
     try {
       var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
+      console.log("got survey admin, line 183");
       var candidateData = candidatesQlData.data.getSurvey.candidateData;
       if (candidateData === null) {
         candidateData = [] 
@@ -191,6 +193,7 @@ function Admin() {
         candidateData.push(survey);
         const graphqlEntry = { 'id': 'candidates', 'candidateData': candidateData };
         await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
+        console.log("updated survey admin, line 195");
       }
     } catch (e) {
       console.log(e);
@@ -221,6 +224,7 @@ function Admin() {
     // removing candidate from graphQl entry with id: 'candidates'
     try {
       var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
+      console.log("got survey admin, line 226")
       var candidateData = candidatesQlData.data.getSurvey.candidateData;
       for (var i = 0; i < candidateData.length; i++) {
         if (candidateData[i] === sub) {
