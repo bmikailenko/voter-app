@@ -1998,6 +1998,7 @@ function Survey() {
       const group = await authUser.signInUserSession.idToken.payload['cognito:groups'];
       const sub = await user.attributes.sub;
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
+      console.log("got survey survey, line 2000");
       if (surveyData.data.getSurvey !== null) {
         const userSurvey = await surveyData.data.getSurvey.data;
         if (userSurvey) {
@@ -2023,8 +2024,10 @@ function Survey() {
       console.log("ENTRY",graphqlEntry);
       if (!userSurvey) {
         await API.graphql(graphqlOperation(createSurvey, { input: graphqlEntry }));
+        console.log("created survey survey, line 2026");
       } else {
         await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
+        console.log("updated survey survey, line 2029");
       }
     } catch (e) {
       console.log(e);

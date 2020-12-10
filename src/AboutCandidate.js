@@ -19,6 +19,7 @@ function AboutCandidate() {
             const user = await Auth.currentUserInfo();
             const sub = await user.attributes.sub;
             const dbdata = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
+            console.log("got survey aboutcandidate, line 21");
             if (!!dbdata.data.getSurvey.candidateName) {
                 console.log(dbdata.data.getSurvey.candidateName);
                 setCandidateName(await dbdata.data.getSurvey.candidateName);
@@ -51,6 +52,7 @@ function AboutCandidate() {
             const description = '' + updateCandDesc;
             const graphqlEntry = { 'id': sub, 'candidateName': name, 'candidateDesc': description };
             await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
+            console.log("updated survey about candidate, line 54");
             setCandidateName(name);
             setCandidateDesc(description);
         } catch (e) {
