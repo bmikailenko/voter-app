@@ -33,6 +33,8 @@ class Candidate {
 }
 
 
+
+
 function Admin() {
   var [userGroup, setUserGroup] = useState(null);
   var [userSurveys, setUserSurveys] = useState();
@@ -402,7 +404,21 @@ function Admin() {
 
     var returnThis = [];
       candidateObs.forEach(candidate => {
-        returnThis.push(candidate.username);
+        if(candidate.username === "39d81ba1-50a2-4f2b-9d4b-24e33407f51f"){
+          returnThis.push("Jay Inslee");
+        }
+        if(candidate.username === "747e2110-b37b-4170-9dc6-e6a1ff1b0b22"){
+          returnThis.push("Jaime Herrera Beutler");
+        }
+        if(candidate.username === "6bdf34e9-f704-4eb4-a132-b1e425499711"){
+          returnThis.push("Carolyn Long");
+        }
+        if(candidate.username === "5f65c112-5524-45d9-bc18-5e22519612d1"){
+          returnThis.push("Joe Biden");
+        }
+        if(candidate.username === "9e319156-3149-4642-a7d7-c8a8e8156fb9"){
+          returnThis.push("Donald J Trump");
+        }
         returnThis.push(candidate.results);
       });
 
