@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import Landing from './Landing';
-import Nav from './Nav';
+import Navigation from './Navigation';
 import About from './About';
 import Dashboard from './Dashboard';
 import CandidateVerification from './CandidateVerification';
@@ -15,7 +15,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Nav />
+        <Navigation />
         <Switch>
           <Route path="/" exact component={Landing}/>
           <Route path="/about" component={About}/>

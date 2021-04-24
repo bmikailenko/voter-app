@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
-import { Link } from 'react-router-dom';
 import { createSurvey, updateSurvey } from './graphql/mutations';
 import { getSurvey } from './graphql/queries';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import * as SurveyQuestions from "survey-react";
 import './App.css';
 import "survey-react/survey.css";
@@ -1999,30 +1998,36 @@ function Survey() {
       const group = await authUser.signInUserSession.idToken.payload['cognito:groups'];
       const sub = await user.attributes.sub;
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
+      console.log("got survey survey, line 2000");
       if (surveyData.data.getSurvey !== null) {
-        const userSurvey = await await surveyData.data.getSurvey.data;
+        const userSurvey = await surveyData.data.getSurvey.data;
         if (userSurvey) {
           setUserSurvey(userSurvey)
         } else {
           setUserSurvey('You dont have one yet!');
         }
       }
-      if (group.includes('candidate')) {
-        setIsCandidate(true);
-      }
+      if (group !== undefined) {
+        if (group.includes('candidate')) {
+          setIsCandidate(true);
+        }
+      } 
     }
     getUserSurvey();
-  }, [userSurvey, isCandidate]);
+  }, []);
 
   const updateUserSurvey = async (newSurvey) => {
     try {
       const user = await Auth.currentUserInfo();
       const sub = await user.attributes.sub;
       const graphqlEntry = { 'id': sub, 'data': newSurvey };
+      console.log("ENTRY",graphqlEntry);
       if (!userSurvey) {
         await API.graphql(graphqlOperation(createSurvey, { input: graphqlEntry }));
+        console.log("created survey survey, line 2026");
       } else {
         await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
+        console.log("updated survey survey, line 2029");
       }
     } catch (e) {
       console.log(e);
@@ -2036,58 +2041,40 @@ function Survey() {
     } else {
       resultData.push('voter');
     }
-    console.log(survey);
     for (var key in survey.data) {
       var question = survey.getQuestionByValueName(key);
-     // console.log(survey.data);
-      if (question) {
+      if (!!question) {
         var item = { value: question.value };
         item.title = question.title;
-
         item.displayValue = question.displayValue
       }
-      else{
-        // var item = { value: question.value };
-        // item.title = question.title;
-        console.log(question.title + ": No Answer");
-        // item.displayValue = question.displayValue
-      }
-      resultData.push(item.title);
-      resultData.push(item.displayValue);
+      resultData.push( '' + item.title);
+      resultData.push( '' + item.displayValue);
     }
     return resultData;
   }
   function onComplete(survey) {
     var data = survey.data;
-        var questions = survey.getAllQuestions();
-        for(var i = 0; i < questions.length; i ++) {
-          var key = questions[i].getValueName();
-          if(!data[key]) data[key] = null;
-        }
-        survey.data = data;
-   // console.log(JSON.stringify())
-    console.log("The results are:" + JSON.stringify(survey.data));
-   // const newSurvey = survey.data;
-    //console.log(isCandidate);
-  
-    console.log("The changes:" +  JSON.stringify(survey));
-    const modSurvey = JSON.stringify(modifySurveyResults(survey));
-    //console.log(modSurvey);
+    var questions = survey.getAllQuestions();
+      for(var i = 0; i < questions.length; i ++) {
+        var key = questions[i].getValueName();
+           if(!data[key]) data[key] = null;
+      }
+    survey.data = data;
+    const modSurvey = modifySurveyResults(survey);
     updateUserSurvey(modSurvey);
     setUserSurvey(modSurvey);
   }
 
   return (
     <div>
-      <AmplifySignOut />
-      <div class="title-section">
+      <div className="title-section">
         <h1>Survey Page</h1>
         <p>Answer as many questions as desired to further express your ideals, policy opinions, and beliefs in any field provided down below.</p>
       </div>
-      <div class="questions">
+      <div className="questions">
         <SurveyQuestions.Survey json={surveyJSON} onComplete={onComplete} />
       </div>
-      <Link to="/dashboard">Dashboard</Link>
     </div>
   );
 }

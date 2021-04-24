@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {Link} from 'react-router-dom';
-import ReactS3, { uploadFile } from 'react-s3';
+import ReactS3 from 'react-s3';
 import './App.css';
 import './verification.css';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 
 
 function CandidateVerification() {
@@ -47,8 +47,7 @@ function CandidateVerification() {
 
 
 	return (
-    <div>
-    	<AmplifySignOut />
+    <div style={{ 'textAlign': 'center'}}>
     	<br/><br/><br/>
     	<h1>Candidate Verification</h1><br/><br/>
 

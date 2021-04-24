@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { getSurvey } from './graphql/queries';
-import {updateSurvey} from './graphql/mutations';
-import { Link } from 'react-router-dom';
-import "survey-react/survey.css";
+import {updateSurvey} from './graphql/mutations';import "survey-react/survey.css";
 import "./AboutCandidate.css";
 import './App.css';
 import default_pfp from './default-pfp-avatar.webp';
@@ -21,6 +19,7 @@ function AboutCandidate() {
             const user = await Auth.currentUserInfo();
             const sub = await user.attributes.sub;
             const dbdata = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
+            console.log("got survey aboutcandidate, line 21");
             if (!!dbdata.data.getSurvey.candidateName) {
                 console.log(dbdata.data.getSurvey.candidateName);
                 setCandidateName(await dbdata.data.getSurvey.candidateName);
@@ -53,6 +52,7 @@ function AboutCandidate() {
             const description = '' + updateCandDesc;
             const graphqlEntry = { 'id': sub, 'candidateName': name, 'candidateDesc': description };
             await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
+            console.log("updated survey about candidate, line 54");
             setCandidateName(name);
             setCandidateDesc(description);
         } catch (e) {
@@ -106,7 +106,7 @@ function AboutCandidate() {
                     </svg> */}
                     <div>Profile Picture</div>
                     <label for="pfp" class="pfp-upload">
-                        <img src={default_pfp} width="120"/>
+                        <div alt="image" src={default_pfp} width="120"/>
                         <input id="pfp" type="file"></input>
                     </label>
                     <br></br><br></br><br></br>
