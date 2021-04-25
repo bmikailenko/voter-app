@@ -4,3 +4,12 @@ ul{
   display: inline-block;
   text-align: left;
 }
+
+
+#verification{
+    position: relative;
+    width: 300px ;
+    height: 30px ;
+    padding: 2px ;
+    border: 2px ;
+}
