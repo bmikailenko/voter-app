@@ -12,8 +12,7 @@ function Dashboard() {
   var [userSurvey, setUserSurvey] = useState([]);
   var [userGroup, setUserGroup] = useState(null);
   var [isCandidate, setIsCandidate] = useState(false);
-  var [bestCandidates, setBestCandidates] = useState();
-
+  var [bestCandidates, setBestCandidates] = useState([]);
   useEffect(() => {
     const getUserSurvey = async () => {
       const user = await Auth.currentAuthenticatedUser();
@@ -22,6 +21,7 @@ function Dashboard() {
       const userSurvey = await fetchSurvey(sub);
 
       if (userSurvey) {
+        //console.log("here her")
         setUserSurvey(userSurvey.data);
       } else {
         console.log("no user survey yet!");
@@ -36,7 +36,7 @@ function Dashboard() {
         }
       }
     }
-
+    //var 
     const fetchAllCandidatesAndData = async (limit) => {
       try {
         var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, { id: 'candidates' }));
@@ -73,10 +73,13 @@ function Dashboard() {
           }
           //console.log(tempCandidateSurveyArray);
         }
+        const user = await Auth.currentAuthenticatedUser();
+        const group = await user.signInUserSession.idToken.payload['cognito:groups'];
+        const sub = await user.attributes.sub;
+        const US = await fetchSurvey(sub);
         //Finding the best match candidate
-        var userParsedSurvey = userSurvey;
-
-        //console.log(userSurveylen)
+        if(userSurvey){
+        var userParsedSurvey = US.data;
         // going through all the fetched candidates from database
         for (const can of tempCandidateSurveyArray) {
           var matchCount = 0;
@@ -96,25 +99,26 @@ function Dashboard() {
               }
             }
           }
-          can.matchValue = matchCount;
-          //console.log(can.matchValue + "   " + can.username);
+        can.matchValue = matchCount;
+        //console.log(can.survey.length);
         }
-
+      }
         var bc = [];
-        for (const can of tempCandidateSurveyArray) {
-          bc.push({ 'matchValue': can.matchValue, 'name': can.username });
+        for(const can of tempCandidateSurveyArray){
+            bc.push({'matchValue' : can.matchValue, 'name' : can.username, 'percentMatch' : ((can.matchValue/can.survey.length)*100).toFixed(1)});
         }
         // console.log(bc);
 
         bc.sort(sortCandidates('matchValue'));
-        //console.log(bc);
-        // setting the candidate survey to match the best fit candidate
-        if (tempCandidateSurveyArray) {
-          setBestCandidates(bc[bc.length - 1].name);
-        }
-        else {
-          console.log("failed to set results");
-        }
+        console.log(bc);
+      // setting the candidate survey to match the best fit candidate
+      if(tempCandidateSurveyArray){
+        setBestCandidates(newARR => [...newARR, {'name':bc[bc.length-1].name, 'percent': bc[bc.length-1].percentMatch}]);
+        setBestCandidates(newARR => [...newARR, {'name':bc[bc.length-2].name, 'percent': bc[bc.length-2].percentMatch}]);
+        setBestCandidates(newARR => [...newARR, {'name':bc[bc.length-3].name, 'percent': bc[bc.length-3].percentMatch}]);
+      }
+      else{
+        console.log("failed to set results");
       }
     }
 
@@ -122,8 +126,6 @@ function Dashboard() {
 
 
     fetchAllCandidatesAndData(50);
-
-
   }, []);
 
   function sortCandidates(key) {
@@ -169,8 +171,9 @@ function Dashboard() {
     var part_4 = 0;
     var part_5 = 0;
     var k = 0;
-
-    for (var i = 4; i < 247; i += 2) { // go through entire survey
+    
+    
+    for (var i = 4; i < 247; i+=2) { // go through entire survey
       k += 1;
 
       if (userSurvey[i]) { // if there is a survey
@@ -206,7 +209,7 @@ function Dashboard() {
 
     // calculate how much the survey is finished
     var percent_finished = (yes_answers + no_answers) / 122;
-
+    var percent_match = bestCandidates.percentMatch;
     // calculate how many answers aren't answered
     var not_answered = 122 - yes_answers - no_answers;
 
@@ -229,11 +232,10 @@ function Dashboard() {
           </Col>
         </Row>
 
-        <Row style={{ 'paddingTop': '60px' }}>
-          <Col>
-            <h4>Best Candidate Matches: {JSON.stringify(bestCandidates)}</h4>
-
-          </Col>
+        <Row style={{'paddingTop': '60px'}}>
+            <Col>
+              <h4>Best Candidate Matches: {JSON.stringify(bestCandidates)}</h4>
+            </Col>
         </Row>
 
         <Row style={{ 'paddingTop': '10px' }}>
