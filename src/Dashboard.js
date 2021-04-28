@@ -121,7 +121,7 @@ function Dashboard() {
         console.log("failed to set results");
       }
     }
-
+  }
     getUserSurvey();
 
 
