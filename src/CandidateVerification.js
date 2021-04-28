@@ -52,29 +52,22 @@ function CandidateVerification() {
     	<h1>Candidate Verification</h1><br/><br/>
 
 
-    	Please upload an image of one of your verification documents.<br/>
-    	You will be sent an email with the details of your verification.
-    	<br/><br/>
-    	The accepted documents are:<br/>
-    	<ul>
-    		<li>Birth Certificate</li>
-			<li>Driver's License</li>
-    		<li>Passport</li>
-    		<li>Military ID</li>
-    	</ul>
-    	<br/>
-    	<br/>
+    	Please upload your relevant Declaration of Candidacy document.<br/>
+    	Following its review, you will be sent an email with the details of your verification.
+    	<br/><br/><br/>
 
-        <input 
-        type="file" 
-        onChange={newFileHandler}
-        />
 
-        <button 
-        onClick={uploadHandler}
-        disabled={!hasFile}>
-        Upload verification document
-        </button>
+        <div>
+            <input type="file" id="verification" name="myfile" accept="image/*, .pdf" onChange={newFileHandler}/>
+
+            <br/>
+
+            <button 
+            onClick={uploadHandler}
+            disabled={!hasFile}>
+            Submit
+            </button>
+        </div>
 
         <br/><br/>
         {(fileSubmitted) ?

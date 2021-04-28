@@ -3,7 +3,8 @@ import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { getSurvey } from './graphql/queries';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, ProgressBar } from 'react-bootstrap';
+import Chart from "react-google-charts";
 import "survey-react/survey.css";
 import './App.css';
 
@@ -39,7 +40,7 @@ function Dashboard() {
     const fetchAllCandidatesAndData = async (limit) => {
       try {
         var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
-        console.log('got survey, dashboard line 41');
+        console.log('got survey');
         var candidateData = candidatesQlData.data.getSurvey.candidateData;
         var rest = []
         for (var i = 0; i < candidateData.length; i+=3) {
@@ -149,12 +150,66 @@ function Dashboard() {
   const fetchSurvey = async (sub) => {
     try {
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
-      console.log("got survey dashboard, line 151");
+      console.log("got survey");
       const survey = await surveyData.data.getSurvey;
       return survey;
     } catch (e) {
       console.log(e);
     }
+  }
+
+
+  // parse the user survey to generate charts
+  if (userSurvey) {
+    var yes_answers = 0;
+    var no_answers = 0;
+    var part_1 = 0;
+    var part_2 = 0;
+    var part_3 = 0;
+    var part_4 = 0;
+    var part_5 = 0;
+    var k = 0;
+    
+    for (var i = 4; i < 247; i+=2) { // go through entire survey
+      k += 1;
+
+      if (userSurvey[i]) { // if there is a survey
+
+        if (userSurvey[i].includes("Yes")) { // yes answers
+          yes_answers += 1;
+          if (k < 50) 
+            part_1 += 1;
+          if (k >= 50 && k < 100)
+            part_2 += 1;
+          if (k >= 100 && k < 150)
+            part_3 += 1;
+          if (k >= 150 && k < 200)
+            part_4 += 1;
+          if (k >= 200 && k < 247)
+            part_5 += 1;
+        }   
+        if (userSurvey[i].includes("No")) { // no answers
+          no_answers += 1;
+          if (k < 50) 
+            part_1 += 1;
+          if (k >= 50 && k < 100)
+            part_2 += 1;
+          if (k >= 100 && k < 150)
+            part_3 += 1;
+          if (k >= 150 && k < 200)
+            part_4 += 1;
+          if (k >= 200 && k < 247)
+            part_5 += 1;
+        }
+      }
+    }
+
+    // calculate how much the survey is finished
+    var percent_finished = (yes_answers + no_answers) / 122;
+
+    // calculate how many answers aren't answered
+    var not_answered = 122 - yes_answers - no_answers;    
+    
   }
 
   return (userGroup !== 'admin') ? (
@@ -180,6 +235,92 @@ function Dashboard() {
             
           </Col>
         </Row>
+
+        <Row style={{'paddingTop': '10px'}}>
+            <Col>
+              You are {Math.trunc(percent_finished * 100)}% done with the survey
+              <ProgressBar now={percent_finished * 100}/>
+            </Col>
+          </Row>
+
+          <Row style={{'paddingTop': '10px'}}>
+            <Col>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Answer', 'Amount'],
+                  ['Yes', yes_answers],
+                  ['No', no_answers],
+                ]}
+                options={{
+                  title: 'Yes/No Ratio',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+            <Col>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Answer', 'Amount'],
+                  ['Yes', yes_answers],
+                  ['No', no_answers],
+                  ['Not Answered', not_answered],
+                ]}
+                options={{
+                  title: 'Survey Completion',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+            <Col style={{'paddingLeft': '10px', 'paddingRight': '10px'}}>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Part', 'Amount'],
+                  ['Part 1', part_1],
+                  ['Part 2', part_2],
+                  ['Part 3', part_3],
+                  ['Part 4', part_4],
+                  ['Part 5', part_5],
+                  ['Not Answered', not_answered],
+                ]}
+                options={{
+                  title: 'Survey Completion By Parts',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+            <Col style={{'paddingLeft': '10px', 'paddingRight': '10px'}}>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Part', 'Amount'],
+                  ['Part 1', part_1],
+                  ['Part 2', part_2],
+                  ['Part 3', part_3],
+                  ['Part 4', part_4],
+                  ['Part 5', part_5],
+                ]}
+                options={{
+                  title: 'Survey By Parts',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+          </Row>
 
       </Container>
 
@@ -228,6 +369,92 @@ function Dashboard() {
             </Col>
           </Row>
 
+          <Row style={{'paddingTop': '10px'}}>
+            <Col>
+              You are {Math.trunc(percent_finished * 100)}% done with the survey
+              <ProgressBar now={percent_finished * 100}/>
+            </Col>
+          </Row>
+
+          <Row style={{'paddingTop': '10px'}}>
+            <Col style={{'paddingLeft': '10px', 'paddingRight': '10px'}}>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Answer', 'Amount'],
+                  ['Yes', yes_answers],
+                  ['No', no_answers],
+                ]}
+                options={{
+                  title: 'Yes/No Ratio',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+            <Col style={{'paddingLeft': '10px', 'paddingRight': '10px'}}>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Answer', 'Amount'],
+                  ['Yes', yes_answers],
+                  ['No', no_answers],
+                  ['Not Answered', not_answered],
+                ]}
+                options={{
+                  title: 'Survey Completion',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+            <Col style={{'paddingLeft': '10px', 'paddingRight': '10px'}}>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Part', 'Amount'],
+                  ['Part 1', part_1],
+                  ['Part 2', part_2],
+                  ['Part 3', part_3],
+                  ['Part 4', part_4],
+                  ['Part 5', part_5],
+                  ['Not Answered', not_answered],
+                ]}
+                options={{
+                  title: 'Survey Completion By Parts',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+            <Col style={{'paddingLeft': '10px', 'paddingRight': '10px'}}>
+              <Chart
+                width={'500px'}
+                height={'300px'}
+                chartType="PieChart"
+                loader={<div>Loading Chart</div>}
+                data={[
+                  ['Part', 'Amount'],
+                  ['Part 1', part_1],
+                  ['Part 2', part_2],
+                  ['Part 3', part_3],
+                  ['Part 4', part_4],
+                  ['Part 5', part_5],
+                ]}
+                options={{
+                  title: 'Survey By Parts',
+                }}
+                rootProps={{ 'data-testid': '1' }}
+              />
+            </Col>
+          </Row>
+          
         </Container>
 
         <div className="fixed-bottom">
