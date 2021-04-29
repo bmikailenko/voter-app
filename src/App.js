@@ -9,7 +9,7 @@ import Survey from './Survey';
 import Admin from './Admin';
 import AboutCandidate from './AboutCandidate';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
-
+import EditProfile from './EditProfile';
 
 function App() {
   return (
@@ -24,6 +24,7 @@ function App() {
           <Route path="/survey" component={Survey}/>
           <Route path="/admin" component={Admin}/>
           <Route path="/aboutcandidate" component={AboutCandidate}/>
+          <Route path="/edit_profile" component={EditProfile} />
         </Switch>
       </div>
     </Router>
