@@ -44,12 +44,12 @@ function Dashboard() {
         var candidateData = candidatesQlData.data.getSurvey.candidateData;
         var rest = []
         for (var i = 0; i < candidateData.length; i += 3) {
-          rest.push({ 'Username': candidateData[i], 'Attributes': [{ 'Name': 'email', 'Value': candidateData[i + 1] }] })
+          rest.push({ 'Username': candidateData[i], 'Attributes': [{ 'Name': 'email', 'Value': candidateData[i + 1] }]})
         }
       } catch (e) {
         console.log(e);
       }
-
+console.log(rest)
       if (rest.length !== 0) {
         var tempCandidateSurveyArray = [];
         for (const user of rest) {
@@ -152,7 +152,7 @@ function Dashboard() {
   const fetchSurvey = async (sub) => {
     try {
       const surveyData = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
-      console.log("got survey");
+     // console.log("got survey");
       const survey = await surveyData.data.getSurvey;
       return survey;
     } catch (e) {
