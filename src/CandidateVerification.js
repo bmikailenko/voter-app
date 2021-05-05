@@ -17,6 +17,7 @@ function CandidateVerification() {
 
 	var [userFile, setUserFile] = useState(null);
 	var [hasFile, setHasFile] = useState(false);
+  var [acknowledgment, setAcknowledgement] = useState(false);
 	var [fileSubmitted, setFileSubmitted] = useState(false); 
 
 	const uploadHandler = async (e) => {
@@ -45,6 +46,10 @@ function CandidateVerification() {
 		setUserFile({value: e.target.files[0]})
 	}
 
+  function acknowledgementHandler(){
+    setAcknowledgement(!acknowledgment);
+  }
+
 
 	return (
     <div style={{ 'textAlign': 'center'}}>
@@ -58,13 +63,17 @@ function CandidateVerification() {
 
 
         <div>
-            <input type="file" id="verification" name="myfile" accept="image/*, .pdf" onChange={newFileHandler}/>
 
+            I acknowledge that, until my verification is finalized, I will be unable to view voter reports.
             <br/>
-
+            <input type="checkbox" name="acknowledge" onChange={acknowledgementHandler}></input>
+            <label for="acknowledge">Acknowledge</label>
+            <br/>
+            <input type="file" id="verification" name="myfile" accept="image/*, .pdf" onChange={newFileHandler}/>
+            <br/>
             <button 
             onClick={uploadHandler}
-            disabled={!hasFile}>
+            disabled={!hasFile | !acknowledgment}>
             Submit
             </button>
         </div>
@@ -76,7 +85,7 @@ function CandidateVerification() {
           	Thank you for your submission! <br/>
          	<Link to="/dashboard">Return to Dashboard</Link>
          	</div>
-         </div> 
+         </div>
          )
         :
         (<div>
