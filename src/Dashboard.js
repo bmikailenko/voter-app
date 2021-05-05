@@ -371,6 +371,9 @@ function Dashboard() {
                 <Button variant="success" href="/survey">Take the Survey</Button>
               </Col>
               <Col md="auto">
+                <Button variant="success" href="/your_survey">Your Survey </Button>
+              </Col>
+              <Col md="auto">
                 <Button variant="success" href="/aboutcandidate">Profile Page</Button>
               </Col>
               <Col md="auto">
@@ -380,6 +383,9 @@ function Dashboard() {
             (<Row className="justify-content-md-center" style={{ 'paddingTop': '60px' }}>
               <Col md="auto">
                 <Button variant="success" href="/survey">Take the Survey</Button>
+              </Col>
+              <Col md="auto">
+                <Button variant="success" href="/your_survey">Your Survey</Button>
               </Col>
               <Col md="auto">
                 <Button variant="secondary" href="/admin">Go to Admin Page</Button>
@@ -478,12 +484,6 @@ function Dashboard() {
               />
             </Col>
           </Row>
-          <h4>Your Survey results:</h4>
-          <br></br>
-          <div>
-            {parseSurvey(userSurvey).map((txt, index) => <p key={index}>{txt}</p>)}
-          </div>
-          <br></br>
         </Container>
 
         <div className="fixed-bottom">
