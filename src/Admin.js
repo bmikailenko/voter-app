@@ -145,7 +145,16 @@ function Admin() {
   // function adds a user as a candidate
   // also adds user to the 'candidates' graphql entry
   async function addCandidate (sub, survey) {
-
+    var canName = await API.graphql(graphqlOperation(getSurvey, { id: sub }));
+    var ActualName;
+    if (!!canName.data.getSurvey.candidateName) {
+      console.log(canName.data.getSurvey.candidateName);
+      ActualName = await canName.data.getSurvey.candidateName;
+   } else {
+    ActualName = "No name provided";
+      console.log("no name");
+    }
+    console.log(ActualName);
     // add the user to the 'candidates' pool group
     const apiName = 'AdminQueries';
     var path = '/addUserToGroup';
@@ -178,10 +187,10 @@ function Admin() {
         var candidateName = attributes.Value;
       }
     }
-
     // adding candidate to graphql entry with id: 'candidates'
     try {
       var candidatesQlData = await API.graphql(graphqlOperation(getSurvey, {id: 'candidates'}));
+      
       console.log("got survey admin, line 183");
       var candidateData = candidatesQlData.data.getSurvey.candidateData;
       if (candidateData === null) {
@@ -189,7 +198,7 @@ function Admin() {
       } 
       if (!candidateData.includes(sub)){
         candidateData.push(sub);
-        candidateData.push(candidateName);
+        candidateData.push(ActualName);
         candidateData.push(survey);
         const graphqlEntry = { 'id': 'candidates', 'candidateData': candidateData };
         await API.graphql(graphqlOperation(updateSurvey, { input: graphqlEntry }));
@@ -385,8 +394,8 @@ function Admin() {
 
      // console.log(candidateObs);
       voterObs.forEach(voter => {
-        console.log("The best score was " + voter.bestScore +  " The best match was ");
-        console.log(voter.candidate);
+       // console.log("The best score was " + voter.bestScore +  " The best match was ");
+        //console.log(voter.candidate);
       });
 
       console.log(" Size of candidates :" + candidateObs.length);

@@ -2056,6 +2056,7 @@ function Survey() {
   function onComplete(survey) {
     var data = survey.data;
     var questions = survey.getAllQuestions();
+
       for(var i = 0; i < questions.length; i ++) {
         var key = questions[i].getValueName();
            if(!data[key]) data[key] = null;
