@@ -10,6 +10,7 @@ import Admin from './Admin';
 import AboutCandidate from './AboutCandidate';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import EditProfile from './EditProfile';
+import YourSurvey from './YourSurvey';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/admin" component={Admin}/>
           <Route path="/aboutcandidate" component={AboutCandidate}/>
           <Route path="/edit_profile" component={EditProfile} />
+          <Route path="/your_survey" component={YourSurvey} />
         </Switch>
       </div>
     </Router>
