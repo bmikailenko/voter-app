@@ -78,50 +78,50 @@ function Dashboard() {
         const sub = await user.attributes.sub;
         const US = await fetchSurvey(sub);
         //Finding the best match candidate
-        if(userSurvey){
-        var userParsedSurvey = US.data;
-        // going through all the fetched candidates from database
-        for (const can of tempCandidateSurveyArray) {
-          var matchCount = 0;
-          var candidateParsedSurveyArray = can.survey;
-          //console.log(candidateParsedSurveyArray);
-          var Surveylen = candidateParsedSurveyArray.length;
-          // console.log(can.matchValue + "   " + can.username);
-          for (i = 0; i < Surveylen; i++) {
-            //&& (userSurveylen === Surveylen) is temproray
-            if ((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0)) {
-              if (candidateParsedSurveyArray[i] !== "") {
-                // console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
-                matchCount++;
-              }
-              else {
-                //console.log("null " + " === " + " null")
+        if (userSurvey) {
+          var userParsedSurvey = US.data;
+          // going through all the fetched candidates from database
+          for (const can of tempCandidateSurveyArray) {
+            var matchCount = 0;
+            var candidateParsedSurveyArray = can.survey;
+            //console.log(candidateParsedSurveyArray);
+            var Surveylen = candidateParsedSurveyArray.length;
+            // console.log(can.matchValue + "   " + can.username);
+            for (i = 0; i < Surveylen; i++) {
+              //&& (userSurveylen === Surveylen) is temproray
+              if ((candidateParsedSurveyArray[i].localeCompare(userParsedSurvey[i]) === 0)) {
+                if (candidateParsedSurveyArray[i] !== "") {
+                  // console.log(candidateParsedSurveyArray[i] + " === " + userParsedSurvey[i])
+                  matchCount++;
+                }
+                else {
+                  //console.log("null " + " === " + " null")
+                }
               }
             }
+            can.matchValue = matchCount;
+            //console.log(can.survey.length);
           }
-        can.matchValue = matchCount;
-        //console.log(can.survey.length);
         }
-      }
         var bc = [];
-        for(const can of tempCandidateSurveyArray){
-            bc.push({'matchValue' : can.matchValue, 'name' : can.username, 'percentMatch' : ((can.matchValue/can.survey.length)*100).toFixed(1)});
+        for (const can of tempCandidateSurveyArray) {
+          bc.push({ 'matchValue': can.matchValue, 'name': can.username, 'percentMatch': ((can.matchValue / can.survey.length) * 100).toFixed(1) });
         }
         // console.log(bc);
 
         bc.sort(sortCandidates('matchValue'));
         console.log(bc);
-      // setting the candidate survey to match the best fit candidate
-      if(tempCandidateSurveyArray){
-        setBestCandidates(newARR => [...newARR, {'name':bc[bc.length-1].name, 'percent': bc[bc.length-1].percentMatch}]);
-        setBestCandidates(newARR => [...newARR, {'name':bc[bc.length-2].name, 'percent': bc[bc.length-2].percentMatch}]);
-        setBestCandidates(newARR => [...newARR, {'name':bc[bc.length-3].name, 'percent': bc[bc.length-3].percentMatch}]);
-      }
-      else{
-        console.log("failed to set results");
+        // setting the candidate survey to match the best fit candidate
+        if (tempCandidateSurveyArray) {
+          setBestCandidates(newARR => [...newARR, { 'name': bc[bc.length - 1].name, 'percent': bc[bc.length - 1].percentMatch }]);
+          setBestCandidates(newARR => [...newARR, { 'name': bc[bc.length - 2].name, 'percent': bc[bc.length - 2].percentMatch }]);
+          setBestCandidates(newARR => [...newARR, { 'name': bc[bc.length - 3].name, 'percent': bc[bc.length - 3].percentMatch }]);
+        }
+        else {
+          console.log("failed to set results");
+        }
       }
     }
-  }
     getUserSurvey();
 
 
@@ -171,9 +171,9 @@ function Dashboard() {
     var part_4 = 0;
     var part_5 = 0;
     var k = 0;
-    
-    
-    for (var i = 4; i < 247; i+=2) { // go through entire survey
+
+
+    for (var i = 4; i < 247; i += 2) { // go through entire survey
       k += 1;
 
       if (userSurvey[i]) { // if there is a survey
@@ -214,7 +214,18 @@ function Dashboard() {
     var not_answered = 122 - yes_answers - no_answers;
 
   }
-
+  function parseSurvey(survey) {
+    var surveyArray = survey;
+    surveyArray = surveyArray.slice(1)
+    var tempArray = [];
+    for (var i = 1; i < surveyArray.length; i += 2) {
+      if (surveyArray[i] !== "") {
+        tempArray.push(surveyArray[i - 1]);
+        tempArray.push(surveyArray[i]);
+      }
+    }
+    return tempArray;
+  }
   return (userGroup !== 'admin') ? (
     <div>
 
@@ -232,10 +243,10 @@ function Dashboard() {
           </Col>
         </Row>
 
-        <Row style={{'paddingTop': '60px'}}>
-            <Col>
-              <h4>Best Candidate Matches: {JSON.stringify(bestCandidates)}</h4>
-            </Col>
+        <Row style={{ 'paddingTop': '60px' }}>
+          <Col>
+            <h4>Best Candidate Matches: {JSON.stringify(bestCandidates)}</h4>
+          </Col>
         </Row>
 
         <Row style={{ 'paddingTop': '10px' }}>
@@ -467,7 +478,12 @@ function Dashboard() {
               />
             </Col>
           </Row>
-
+          <h4>Your Survey results:</h4>
+          <br></br>
+          <div>
+            {parseSurvey(userSurvey).map((txt, index) => <p key={index}>{txt}</p>)}
+          </div>
+          <br></br>
         </Container>
 
         <div className="fixed-bottom">
@@ -483,7 +499,7 @@ function Dashboard() {
             </div>
             )}
 
-          
+
         </div>
 
 
